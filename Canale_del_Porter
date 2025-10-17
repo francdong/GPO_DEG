@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafico Catena del Valore di Porter</title>
+    <style>
+        /* Stili generali */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+       
+        #value-chain {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+       
+        /* Stili per le attività di supporto (verdi, in colonna e allargate) */
+        .support-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+       
+        .support-box {
+            border: 2px solid #4CAF50; /* Colore verde */
+            padding: 10px;
+            margin: 5px;
+            width: 100%;  /* Allargata al massimo */
+            background-color: #e8f5e9;
+            text-align: center;
+            border-radius: 5px;
+        }
+       
+        /* Stili per le attività primarie (blu, in riga con forma di casetta) */
+        .primary-section {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around;
+            width: 100%;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+       
+        .primary-box {
+            border: 2px solid #2196F3; /* Colore blu */
+            padding: 10px;
+            margin: 5px;
+            width: 220px;
+            background-color: #e3f2fd;
+            text-align: center;
+            border-radius: 5px;
+            position: relative;  /* Necessario per posizionare il tetto */
+            overflow: hidden;  /* Evita che il tetto fuoriesca male */
+        }
+       
+        /* Aggiunta del tetto (triangolo) per la forma di casetta */
+        .primary-box::before {
+            content: '';
+            position: absolute;
+            top: -20px;  /* Posiziona il tetto sopra la casella */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 30px solid transparent;  /* Triangolo simmetrico */
+            border-right: 30px solid transparent;
+            border-bottom: 20px solid #2196F3;  /* Colore blu, come la casella */
+        }
+       
+        /* Stili per le frecce (triangoli, puntano a destra) */
+        .arrow {
+            width: 0;
+            height: 0;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-left: 25px solid #f44336;
+            margin: 0 20px;
+        }
+       
+        /* Aggiunta opzionale per migliorare il layout */
+        h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+       
+        p {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Grafico della Catena del Valore di Michael Porter</h1>
+    <p>Le caselle verdi (supporto) sono allargate al massimo e disposte in colonna. Le caselle blu (primarie) ora hanno la forma di una casetta semplice, con un tetto triangolare.</p>
+   
+    <div id="value-chain">
+        <!-- Sezione per le attività di supporto (verdi, in colonna e allargate) -->
+        <div class="support-section">
+            <div class="support-box">
+                <h3>Titolo: Firm Infrastructure</h3>
+                <p>Spiegazione secondo Porter: Inserisci qui la struttura organizzativa, i sistemi di controllo e le risorse amministrative.</p>
+            </div>
+            <div class="support-box">
+                <h3>Titolo: Human Resource Management</h3>
+                <p>Spiegazione secondo Porter: Inserisci reclutamento, formazione e gestione del personale.</p>
+            </div>
+            <div class="support-box">
+                <h3>Titolo: Technology Development</h3>
+                <p>Spiegazione secondo Porter: Inserisci ricerca e sviluppo, innovazione tecnologica.</p>
+            </div>
+            <div class="support-box">
+                <h3>Titolo: Procurement</h3>
+                <p>Spiegazione secondo Porter: Inserisci l'acquisizione di input.</p>
+            </div>
+        </div>
+       
+        <!-- Sezione per le attività primarie (blu, in riga con forma di casetta) -->
+        <div class="primary-section">
+            <div class="primary-box">
+                <h3>Titolo: Inbound Logistics</h3>
+                <p>Spiegazione secondo Porter: Inserisci la gestione dell'arrivo, stoccaggio e distribuzione dei materiali in ingresso.</p>
+            </div>
+            <div class="arrow"></div>
+            <div class="primary-box">
+                <h3>Titolo: Operations</h3>
+                <p>Spiegazione secondo Porter: Inserisci la trasformazione dei materiali in prodotti finiti.</p>
+            </div>
+            <div class="arrow"></div>
+            <div class="primary-box">
+                <h3>Titolo: Outbound Logistics</h3>
+                <p>Spiegazione secondo Porter: Inserisci la distribuzione dei prodotti finiti ai clienti.</p>
+            </div>
+            <div class="arrow"></div>
+            <div class="primary-box">
+                <h3>Titolo: Marketing and Sales</h3>
+                <p>Spiegazione secondo Porter: Inserisci promozione e vendita dei prodotti.</p>
+            </div>
+            <div class="arrow"></div>
+            <div class="primary-box">
+                <h3>Titolo: Service</h3>
+                <p>Spiegazione secondo Porter: Inserisci il supporto post-vendita.</p>
+            </div>
+        </div>
+    </div>
+   
+    <p><strong>Note:</strong> Ogni casella blu ora ha un tetto triangolare per somigliare a una casetta. Se vuoi personalizzare la forma (es. rendere il tetto più grande o cambiare colore), fammi sapere! Ad esempio, puoi modificare i valori in `.primary-box::before` per regolare le dimensioni.</p>
+</body>
+</html>
