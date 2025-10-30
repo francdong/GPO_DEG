@@ -1,3 +1,4 @@
 # GPO_DEG
-Gestione Progetto e Organizzazione di Impresa</br>
-https://francdong.github.io/GPO_DEG/Porter2
+Gestione Progetto e Organizzazione di Impresa
+
+# https://francdong.github.io/GPO_DEG/Porter2
