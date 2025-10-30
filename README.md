@@ -1,4 +1,4 @@
 # GPO_DEG
 Gestione Progetto e Organizzazione di Impresa
-
-# https://francdong.github.io/GPO_DEG/Porter2
+#LINK/URL
+1. https://francdong.github.io/GPO_DEG/Porter2
