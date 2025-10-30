@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Grafico Catena del Valore Personalizzato</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+
+  /* Contenitore principale */
+  .value-chain-container {
+    max-width: 900px;
+    margin: auto;
+  }
+
+  /* Sezione rettangolo azzurro in alto */
+  .top-section {
+    background-color: #cce6ff; /* azzurro chiaro */
+    border: 1px solid #99ccff;
+    padding: 5px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.3;
+    display: grid;
+    grid-template-rows: repeat(5, auto);
+  }
+
+  .top-section div {
+    border-bottom: 1px solid #99ccff;
+    padding: 4px 0;
+  }
+
+  /* Ultima riga senza bordo inferiore */
+  .top-section div:last-child {
+    border-bottom: none;
+    font-weight: bold;
+  }
+
+  /* Sezione centrale contenente attività e freccia */
+  .middle-section {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  /* Colonna attività primarie (sezione gialla/arancione) */
+  .primary-activities {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    width: 80%;
+  }
+
+  .activity-box {
+    padding: 10px;
+    font-size: 12px;
+    border: 1px solid #bfbfbf;
+    min-height: 80px;
+  }
+
+  /* Colori specifici per ogni cella */
+  .activity1 {
+    background-color: #fffacd; /* giallo chiaro */
+    border-right: none;
+  }
+
+  .activity2 {
+    background-color: #ffe066; /* giallo */
+    border-right: none;
+  }
+
+  .activity3 {
+    background-color: #ffbb33; /* arancione chiaro */
+    border-right: none;
+  }
+
+  .activity4, .activity5 {
+    background-color: #ff9933; /* arancione */
+  }
+
+  /* Divisione in righe, per il secondo blocco (la seconda riga nel contenuto centrale) */
+  .activity-box p {
+    margin: 5px 0;
+  }
+
+  /* Freccia blu a destra */
+  .margin-arrow {
+    width: 0;
+    height: 0;
+    border-top: 90px solid transparent;
+    border-bottom: 90px solid transparent;
+    border-left: 90px solid #0033cc; /* blu scuro */
+    position: relative;
+    margin-left: 10px;
+    flex-shrink: 0;
+  }
+
+  /* Testo inclinato sulla freccia */
+  .margin-arrow span {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%) rotate(45deg);
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    white-space: nowrap;
+  }
+
+  /* Sezione include la barra verde 'Attività primarie' con freccia */
+  .activities-label {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    width: 80%;
+  }
+
+  .green-arrow {
+    width: 0;
+    height: 0;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    border-right: 30px solid #4caf50;
+    margin-right: 8px;
+  }
+
+  .green-bar {
+    background-color: #4caf50;
+    color: white;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    flex-grow: 1;
+    text-align: center;
+    border-radius: 4px;
+  }
+
+</style>
+</head>
+<body>
+  <div class="value-chain-container">
+    <!-- Rettangolo azzurro in alto con righe -->
+    <div class="top-section">
+      <div>Creare l'agenzia</div>
+      <div>Selezionare personale e autisti - 25.000 €</div>
+      <div>Acquisto di due bus usati: Mercedes e Setra -105.000€</div>
+      <div>Destinare 20.00€ per accordi con hotel e deposito bus</div>
+      <div style="font-weight:bold;">Approvvigionamenti</div>
+    </div>
+
+    <!-- Sezione centrale attività primarie e freccia blu -->
+    <div class="middle-section">
+      <div class="primary-activities">
+        <div class="activity-box activity1">
+          <strong>Ottenere licenze e permessi</strong><br>
+          per passeggeri, + assicurare bus e attività con polizze adeguate -10.000€
+        </div>
+        <div class="activity-box activity2">
+          <strong>Gestione e manutenzione</strong><br>
+          -10.000€, preparare e aggiornare offerte e pacchetti viaggio (bus+hotel+personalizzazioni varie)
+        </div>
+        <div class="activity-box activity3">
+          <strong>Lancio servizi Move&Rest</strong><br>
+          marketing e vendite (sito web,campagne pubblicitarie,promozioni,pacchetti viaggio)-15.000€
+        </div>
+        <div class="activity-box activity4">
+          <strong>Verifica di pagamento</strong><br>
+          cliente effettua l'ordine e paga online tramite sito = rilascio promozione o biglietto digitale
+        </div>
+        <div class="activity-box activity5">
+          <strong>Verifica di pagamento</strong><br>
+          verifica di pagamento + pagamento accettato + controllo e gestione recensioni online(monitorato feedback,risposte a clienti)
+        </div>
+      </div>
+
+      <!-- Freccia blu "Margine" a destra -->
+      <div class="margin-arrow">
+        <span>Margine</span>
+      </div>
+    </div>
+
+    <!-- Barra verde Attività primarie -->
+    <div class="activities-label">
+      <div class="green-arrow"></div>
+      <div class="green-bar">Attività primarie</div>
+    </div>
+  </div>
+</body>
+</html>
