@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<title>Grafico Catena del Valore Personalizzato</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #0b0f1a;
+    color: #e5e7eb;
+    background-image:
+      /* velatura lineare unificante (prima per fondere bene) */
+      linear-gradient(120deg, rgba(21,24,38,0.55) 0%, rgba(14,18,30,0.22) 60%, rgba(11,15,26,0.10) 100%),
+      /* alone violet molto ampio e progressivo (più presenza) */
+      radial-gradient(100rem 80rem at 72% 12%, rgba(168,85,247,0.22) 0%, rgba(168,85,247,0.13) 30%, rgba(168,85,247,0.06) 55%, rgba(168,85,247,0.03) 72%, transparent 88%),
+      /* alone magenta molto ampio e progressivo (più presenza) */
+      radial-gradient(95rem 75rem at 18% 88%, rgba(192,38,211,0.20) 0%, rgba(192,38,211,0.12) 32%, rgba(192,38,211,0.06) 58%, rgba(192,38,211,0.03) 76%, transparent 90%);
+    background-attachment: fixed;
+  }
+
+  @keyframes circuitsPulse {
+    from { opacity: 0.28; }
+    to   { opacity: 0.42; }
+  }
+
+  /* Overlay esagonale tenue sullo sfondo */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(1000px 600px at 50% -10%, rgba(124,58,237,0.11), transparent 65%),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="52" viewBox="0 0 52 45"><path d="M13 1 L39 1 L51 22.5 L39 44 L13 44 L1 22.5 Z" fill="none" stroke="%23a855f733" stroke-width="1"/></svg>');
+    background-size: cover, 60px 52px;
+    filter: drop-shadow(0 0 5px rgba(124,58,237,0.28));
+    opacity: 0.28;
+    pointer-events: none;
+  }
+
+  /* Vignettatura soffusa per eliminare stacchi netti ai bordi */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      /* noise leggerissimo per spezzare il banding */
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" stitchTiles="stitch"/></filter><rect width="120" height="120" filter="url(%23n)" opacity="0.025"/></svg>') repeat,
+      radial-gradient(120rem 80rem at 50% 50%, rgba(0,0,0,0) 62%, rgba(0,0,0,0.28) 100%);
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+  }
+
+  /* Layer animato per rendere i colori piu' "fighi" ma discreti */
+  .bg-anim {
+    position: fixed;
+    inset: -10% -10% -10% -10%;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      conic-gradient(from 0deg at 50% 50%,
+        rgba(192,38,211,0.14) 0deg,
+        rgba(168,85,247,0.16) 60deg,
+        rgba(124,58,237,0.15) 120deg,
+        rgba(192,38,211,0.14) 180deg,
+        rgba(168,85,247,0.16) 240deg,
+        rgba(124,58,237,0.15) 300deg,
+        rgba(192,38,211,0.14) 360deg);
+    filter: saturate(1.2) brightness(1.08);
+    mix-blend-mode: overlay;
+    animation: hueSweep 30s linear infinite;
+  }
+
+  @keyframes hueSweep {
+    0% { transform: rotate(0deg) scale(1.04); opacity: 0.60; }
+    50% { transform: rotate(180deg) scale(1.04); opacity: 0.80; }
+    100% { transform: rotate(360deg) scale(1.04); opacity: 0.60; }
+  }
+
+  /* Shimmer sweep delicato */
+  .bg-anim::before {
+    content: "";
+    position: absolute;
+    inset: -20% -20% -20% -20%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    transform: translateX(-100%);
+    animation: sweep 10s ease-in-out infinite;
+    mix-blend-mode: soft-light;
+  }
+
+  @keyframes sweep {
+    0% { transform: translateX(-100%); }
+    50% { transform: translateX(0%); }
+    100% { transform: translateX(100%); }
+  }
+
+  /* Starfield particellare in slow-drift */
+  .bg-anim::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.05) 0.5px, transparent 1.2px),
+                      radial-gradient(circle at 70% 60%, rgba(255,255,255,0.045) 0.5px, transparent 1.2px),
+                      radial-gradient(circle at 40% 80%, rgba(255,255,255,0.04) 0.5px, transparent 1.2px);
+    background-size: 800px 800px, 900px 900px, 1000px 1000px;
+    animation: drift 80s linear infinite;
+    opacity: 0.35;
+    mix-blend-mode: screen;
+  }
+
+  @keyframes drift {
+    0% { background-position: 0 0, 0 0, 0 0; }
+    100% { background-position: 200px 150px, -180px 120px, 160px -140px; }
+  }
+
+  .stars-img {
+    position: fixed;
+    inset: 0;
+    z-index: -5;
+    pointer-events: none;
+    background-image:
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="none"/><g fill="%23ffffff"><circle cx="20" cy="30" r="0.8"/><circle cx="80" cy="60" r="0.9"/><circle cx="140" cy="20" r="0.7"/><circle cx="180" cy="90" r="0.8"/><circle cx="40" cy="120" r="0.9"/><circle cx="120" cy="140" r="0.8"/><circle cx="160" cy="170" r="0.9"/><circle cx="10" cy="180" r="0.7"/></g><g fill="%23dbeafe" opacity="0.7"><circle cx="55" cy="15" r="0.7"/><circle cx="95" cy="100" r="0.6"/><circle cx="30" cy="165" r="0.6"/><circle cx="170" cy="50" r="0.6"/></g></svg>'),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320"><rect width="320" height="320" fill="none"/><g fill="%23ffffff" opacity="0.6"><circle cx="30" cy="40" r="0.8"/><circle cx="150" cy="70" r="0.8"/><circle cx="280" cy="30" r="0.9"/><circle cx="210" cy="160" r="0.8"/><circle cx="90" cy="200" r="0.9"/><circle cx="300" cy="250" r="0.8"/><circle cx="40" cy="290" r="0.9"/></g></svg>');
+    background-repeat: repeat, repeat;
+    background-size: 200px 200px, 320px 320px;
+    animation: starsDrift 90s linear infinite;
+    opacity: 0.55;
+    mix-blend-mode: screen;
+  }
+
+  @keyframes starsDrift {
+    0% { background-position: 0 0, 0 0; }
+    100% { background-position: 240px 180px, -220px 160px; }
+  }
+
+  #stars {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -3;
+    pointer-events: none;
+  }
+
+  /* Circuiti luminosi sullo sfondo (linee diagonali) */
+  .bg-circuits {
+    position: fixed;
+    inset: 0;
+    z-index: -5;
+    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(120deg, rgba(167,139,250,0.08) 0 1px, transparent 1px 22px),
+      repeating-linear-gradient(300deg, rgba(192,38,211,0.07) 0 1px, transparent 1px 26px);
+    background-size: 200% 200%;
+    animation: circuitsMove 30s linear infinite, circuitsPulse 8s ease-in-out infinite alternate;
+    mix-blend-mode: lighten;
+    opacity: 0.35;
+  }
+
+  @keyframes circuitsMove {
+    0%   { background-position:   0%   0%,   0%   0%; }
+    100% { background-position: 200% 200%, -200% -200%; }
+  }
+
+  /* Onde morbide stile mare (layer sotto) */
+  .bg-waves {
+    position: fixed;
+    inset: 0;
+    z-index: -4;
+    pointer-events: none;
+    overflow: hidden;
+    mix-blend-mode: screen;
+  }
+  .bg-waves svg {
+    position: absolute;
+    bottom: -8%;
+    left: 0;
+    width: 200%;
+    height: 60%;
+    opacity: 0.4;
+    filter: blur(7px) saturate(1.1);
+  }
+  .bg-waves .layer1 { animation: wave1 32s linear infinite; }
+  .bg-waves .layer2 { animation: wave2 44s linear infinite; opacity: 0.34; }
+  .bg-waves .layer3 { animation: wave3 60s linear infinite; opacity: 0.28; }
+
+  @keyframes wave1 { from { transform: translateX(0); } to { transform: translateX(-25%); } }
+  @keyframes wave2 { from { transform: translateX(-10%); } to { transform: translateX(10%); } }
+  @keyframes wave3 { from { transform: translateX(0); } to { transform: translateX(-15%); } }
+
+  /* Contenitore principale */
+  .value-chain-container {
+    --triangle-width: 130px;
+    max-width: 900px;
+    margin: auto;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr var(--triangle-width);
+    grid-auto-rows: auto;
+    column-gap: 16px;
+    row-gap: 12px;
+    align-items: start;
+  }
+
+  /* Overlay per diminuire la luminosità del contenuto */
+  .value-chain-container::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    /* Copre solo la colonna contenuto (colonna 1) lasciando libera la colonna triangolo */
+    width: calc(100% - var(--triangle-width) - 16px);
+    pointer-events: none;
+    background: rgba(0,0,0,0.18); /* intensità dim: aumenta per scurire */
+    mix-blend-mode: multiply;
+    border-radius: 0; /* adatta se servono angoli arrotondati */
+    z-index: 0;
+  }
+
+  /* Assicura che il contenuto resti sopra l'overlay */
+  .value-chain-container > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Stage centrato per evitare flash prima dello script */
+  .stage {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  /* Sezione rettangolo azzurro in alto */
+  .top-section {
+    background-color: #0f172a; /* dark card */
+    border: 1px solid #a855f7; /* violet */
+    padding: 5px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.3;
+    display: grid;
+    grid-template-rows: repeat(5, auto);
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+    box-shadow: 0 0 10px rgba(168,85,247,0.25), inset 0 0 6px rgba(124,58,237,0.15);
+  }
+
+  .top-section div {
+    border-bottom: 1px solid rgba(167,139,250,0.35); /* violet divider */
+    padding: 4px 0;
+  }
+
+  /* Ultima riga senza bordo inferiore */
+  .top-section div:last-child {
+    border-bottom: none;
+    font-weight: bold;
+  }
+
+  /* Riga che contiene la sezione centrale e il triangolo */
+  .middle-row {
+    position: relative;
+    width: 100%;
+    margin-top: 0;
+    grid-column: 1;
+  }
+
+  /* Sezione centrale (solo attività) */
+  .middle-section {
+    width: 100%;
+    margin: 0;
+    grid-column: 1;
+  }
+
+  /* Colonna attività primarie (sezione gialla/arancione) */
+  .primary-activities {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    width: 100%;
+  }
+
+  .activity-box {
+    padding: 10px;
+    font-size: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+    min-height: 80px;
+    color: #e5e7eb;
+    box-shadow: 0 0 6px rgba(124,58,237,0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .activity-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 14px rgba(168,85,247,0.35);
+    border-color: rgba(167,139,250,0.6);
+  }
+
+  /* Shimmer diagonale sui box in hover */
+  .activity-box::after {
+    content: "";
+    position: absolute;
+    top: -20%;
+    left: -120px;
+    width: 60px;
+    height: 140%;
+    transform: rotate(18deg);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.24), transparent);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .activity-box:hover::after {
+    animation: shimmer 0.9s ease forwards;
+    opacity: 1;
+  }
+
+  @keyframes shimmer {
+    0%   { left: -120px; opacity: 0; }
+    10%  { opacity: 1; }
+    100% { left: 120%; opacity: 0; }
+  }
+
+  /* Colori specifici per ogni cella */
+  .activity1 {
+    background-color: #111827; /* dark slate */
+    border-right: none;
+  }
+
+  .activity2 {
+    background-color: #0f172a; /* deep navy */
+    border-right: none;
+  }
+
+  .activity3 {
+    background-color: #1a103d; /* deep violet */
+    border-right: none;
+  }
+
+  .activity4 {
+    background-color: #241039; /* violet */
+  }
+
+  .activity5 {
+    background-color: #2a0f2f; /* magenta tint */
+  }
+
+  /* Divisione in righe, per il secondo blocco (la seconda riga nel contenuto centrale) */
+  .activity-box p {
+    margin: 5px 0;
+  }
+
+  /* Freccia (colonna dedicata in griglia) */
+  .margin-arrow {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: stretch;
+    width: var(--triangle-width);
+    height: 100%;
+    background: linear-gradient(180deg, #c026d3 0%, #7c3aed 100%);
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+    box-shadow: 0 0 16px rgba(124,58,237,0.5), 0 0 28px rgba(192,38,211,0.35);
+    animation: neonPulse 5s ease-in-out infinite;
+    position: relative;
+  }
+
+  @keyframes neonPulse {
+    0%, 100% { filter: saturate(1.0) brightness(1.0); box-shadow: 0 0 16px rgba(124,58,237,0.45), 0 0 28px rgba(192,38,211,0.30); }
+    50%      { filter: saturate(1.1) brightness(1.06); box-shadow: 0 0 22px rgba(192,38,211,0.55), 0 0 36px rgba(124,58,237,0.40); }
+  }
+
+  /* Testo inclinato sulla freccia */
+  .margin-arrow span {
+    position: absolute;
+    top: 50%;
+    left: 28px;
+    transform: translateY(-50%) rotate(45deg);
+    color: #f5f5f5;
+    font-weight: bold;
+    font-size: 16px;
+    white-space: nowrap;
+  }
+
+  /* Sezione include la barra verde 'Attività primarie' con freccia */
+  .activities-label {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    width: 100%;
+    grid-column: 1;
+  }
+
+  /* Variante top della label: sopra le attività, con freccia a destra */
+  .activities-top {
+    margin-top: 0;
+    margin-bottom: 8px;
+    grid-column: 1;
+    width: 100%;
+  }
+
+  .arrow-right {
+    width: 0;
+    height: 0;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    border-left: 30px solid #c026d3; /* magenta */
+    margin-left: 8px;
+  }
+
+  .green-arrow {
+    width: 0;
+    height: 0;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    border-right: 30px solid #c026d3; /* magenta */
+    margin-right: 8px;
+  }
+
+  .green-bar {
+    background: linear-gradient(90deg, #c026d3 0%, #7c3aed 100%);
+    color: white;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    flex-grow: 1;
+    text-align: center;
+    border-radius: 4px;
+    box-shadow: 0 0 12px rgba(192,38,211,0.35);
+    animation: neonPulse 5s ease-in-out infinite;
+  }
+
+  /* Font display per elementi chiave */
+  .value-chain-container strong,
+  .green-bar,
+  .margin-arrow span {
+    font-family: 'Orbitron', Arial, sans-serif;
+    letter-spacing: 0.5px;
+  }
+
+</style>
+</head>
+<body>
+  <div class="stars-img" aria-hidden="true"></div>
+  <div class="bg-anim" aria-hidden="true"></div>
+  <div class="bg-waves" aria-hidden="true">
+    <svg class="layer1" viewBox="0 0 1200 400" preserveAspectRatio="none">
+      <path d="M0,240 C200,200 300,280 500,240 C700,200 900,280 1200,230 L1200,400 L0,400 Z" fill="rgba(168,85,247,0.12)"/>
+    </svg>
+    <svg class="layer2" viewBox="0 0 1200 400" preserveAspectRatio="none">
+      <path d="M0,260 C220,220 360,300 560,260 C760,220 980,300 1200,250 L1200,400 L0,400 Z" fill="rgba(192,38,211,0.10)"/>
+    </svg>
+    <svg class="layer3" viewBox="0 0 1200 400" preserveAspectRatio="none">
+      <path d="M0,280 C240,240 420,320 640,280 C860,240 1040,320 1200,270 L1200,400 L0,400 Z" fill="rgba(124,58,237,0.09)"/>
+    </svg>
+  </div>
+  <canvas id="stars" aria-hidden="true"></canvas>
+  <div class="stage">
+    <div class="value-chain-container">
+    <!-- Rettangolo azzurro in alto con righe -->
+    <div class="top-section">
+      <div>Creare l'agenzia</div>
+      <div>Selezionare personale e autisti - 25.000 €</div>
+      <div>Acquisto di due bus usati: Mercedes e Setra -105.000€</div>
+      <div>Destinare 20.00€ per accordi con hotel e deposito bus</div>
+      <div style="font-weight:bold;">Approvvigionamenti</div>
+    </div>
+
+    <!-- Barra superiore con freccia opposta -->
+    <div class="activities-label activities-top">
+      <div class="green-bar">Attività di supporto</div>
+      <div class="arrow-right"></div>
+    </div>
+
+    <!-- Sezione centrale attività primarie -->
+    <div class="middle-row">
+      <div class="middle-section">
+        <div class="primary-activities">
+          <div class="activity-box activity1">
+          <strong>Ottenere licenze e permessi</strong><br>
+          per passeggeri, + assicurare bus e attività con polizze adeguate -10.000€
+          </div>
+          <div class="activity-box activity2">
+          <strong>Gestione e manutenzione</strong><br>
+          -10.000€, preparare e aggiornare offerte e pacchetti viaggio (bus+hotel+personalizzazioni varie)
+          </div>
+          <div class="activity-box activity3">
+          <strong>Lancio servizi Move&Rest</strong><br>
+          marketing e vendite (sito web,campagne pubblicitarie,promozioni,pacchetti viaggio)-15.000€
+          </div>
+          <div class="activity-box activity4">
+          <strong>Verifica di pagamento</strong><br>
+          cliente effettua l'ordine e paga online tramite sito = rilascio promozione o biglietto digitale
+          </div>
+          <div class="activity-box activity5">
+          <strong>Verifica di pagamento</strong><br>
+          verifica di pagamento + pagamento accettato + controllo e gestione recensioni online(monitorato feedback,risposte a clienti)
+          </div>
+        </div>
+      </div>
+      <!-- Freccia blu "Margine" a destra (in colonna 2 della griglia) -->
+      <div class="margin-arrow">
+        <span>Margine</span>
+      </div>
+
+      <!-- Barra verde Attività primarie -->
+      <div class="activities-label">
+        <div class="green-arrow"></div>
+        <div class="green-bar">Attività primarie</div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <script>
+  (function() {
+    // Adatta posizione testo triangolo al nuovo layout a griglia
+    function adjustTriangleLabel() {
+      var arrow = document.querySelector('.margin-arrow');
+      if (!arrow) return;
+      var label = arrow.querySelector('span');
+      if (!label) return;
+      // usa la larghezza dalla CSS var o dal DOM
+      var cs = getComputedStyle(document.querySelector('.value-chain-container'));
+      var varWidth = cs.getPropertyValue('--triangle-width').trim();
+      var base = parseFloat(varWidth);
+      if (!base || isNaN(base)) base = arrow.clientWidth || 130;
+      label.style.left = Math.round(base * 0.22) + 'px';
+    }
+
+    // Centra e scala l'intero diagramma per farlo stare sempre al centro e completamente visibile
+    function fitToViewport() {
+      var stage = document.querySelector('.stage');
+      var container = document.querySelector('.value-chain-container');
+      if (!stage || !container) return;
+      // reset per misurare dimensioni reali
+      var prev = container.style.transform;
+      container.style.transform = 'none';
+      // padding margini minimi
+      var pad = 32; // px
+      var vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+      var vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+      var availW = Math.max(200, vw - pad);
+      var availH = Math.max(200, vh - pad);
+      var cw = container.offsetWidth;
+      var ch = container.offsetHeight;
+      var scale = Math.min(availW / cw, availH / ch, 1);
+      container.style.transform = 'scale(' + scale.toFixed(3) + ')';
+      container.style.transformOrigin = 'center center';
+      // dimensiona lo stage per centrare
+      stage.style.minHeight = '100vh';
+      stage.style.display = 'flex';
+      stage.style.alignItems = 'center';
+      stage.style.justifyContent = 'center';
+      stage.style.padding = '16px';
+      // ripristina se necessario
+      if (!prev) return; // manteniamo nuovo transform
+    }
+
+    function onReady() {
+      adjustTriangleLabel();
+      fitToViewport();
+    }
+
+    window.addEventListener('DOMContentLoaded', onReady);
+    window.addEventListener('load', onReady);
+    window.addEventListener('resize', fitToViewport);
+    
+    // Starfield canvas
+    var canvas = document.getElementById('stars');
+    if (canvas) {
+      var ctx = canvas.getContext('2d', { alpha: true });
+      var dpr = Math.max(1, window.devicePixelRatio || 1);
+      var stars = [];
+      var shooting = [];
+      var w = 0, h = 0, t = 0, running = true;
+
+      function resizeStars() {
+        var cw = Math.floor((canvas.clientWidth || window.innerWidth) * dpr);
+        var ch = Math.floor((canvas.clientHeight || window.innerHeight) * dpr);
+        w = canvas.width = cw;
+        h = canvas.height = ch;
+        initStars();
+      }
+
+      function rnd(a, b) { return a + Math.random() * (b - a); }
+      function makeStar() {
+        return {
+          x: rnd(0, w),
+          y: rnd(0, h),
+          r: rnd(0.4, 1.6) * dpr,
+          a: rnd(0.2, 0.9),
+          tw: rnd(0.006, 0.028),
+          ph: rnd(0, Math.PI * 2),
+          life: rnd(5, 12),
+          dead: false,
+          fade: 0
+        };
+      }
+
+      function initStars() {
+        var density = 0.00022;
+        var target = Math.max(120, Math.floor(w * h * density));
+        stars = new Array(target).fill(0).map(makeStar);
+      }
+
+      function makeShooting() {
+        var ang = Math.PI * rnd(0.15, 0.3);
+        var speed = rnd(500, 900) * dpr;
+        var len = rnd(120, 220) * dpr;
+        shooting.push({
+          x: rnd(-50 * dpr, w * 0.2),
+          y: rnd(0, h * 0.4),
+          vx: Math.cos(ang) * speed,
+          vy: Math.sin(ang) * speed,
+          len: len,
+          a: 1,
+          life: rnd(0.7, 1.2)
+        });
+      }
+
+      function step(dt) {
+        t += dt;
+        for (var i = 0; i < stars.length; i++) {
+          var s = stars[i];
+          if (!s.dead) s.a = 0.5 + 0.5 * Math.sin(t * s.tw * 6.283 + s.ph);
+          s.life -= dt;
+          if (s.life <= 0 && !s.dead) { s.dead = true; s.fade = 0.5; }
+          if (s.dead) {
+            s.fade -= dt;
+            if (s.fade <= 0) stars[i] = makeStar();
+          }
+        }
+        if (Math.random() < 0.006) makeShooting();
+        for (var j = shooting.length - 1; j >= 0; j--) {
+          var sh = shooting[j];
+          sh.x += sh.vx * dt; sh.y += sh.vy * dt; sh.life -= dt; sh.a = Math.max(0, sh.life);
+          if (sh.life <= 0 || sh.x - sh.len > w || sh.y - sh.len > h) shooting.splice(j, 1);
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        ctx.globalCompositeOperation = 'lighter';
+        for (var i = 0; i < stars.length; i++) {
+          var s = stars[i];
+          var alpha = (s.dead ? Math.max(0, s.fade) : s.a) * 0.9;
+          ctx.fillStyle = 'rgba(255,255,255,' + alpha + ')';
+          ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = 'rgba(160,200,255,' + (alpha * 0.35) + ')';
+          ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2); ctx.fill();
+        }
+        for (var k = 0; k < shooting.length; k++) {
+          var sh = shooting[k];
+          var ang = Math.atan2(sh.vy, sh.vx);
+          var tx = sh.x - Math.cos(ang) * sh.len;
+          var ty = sh.y - Math.sin(ang) * sh.len;
+          var grad = ctx.createLinearGradient(sh.x, sh.y, tx, ty);
+          grad.addColorStop(0, 'rgba(255,255,255,' + sh.a + ')');
+          grad.addColorStop(1, 'rgba(255,255,255,0)');
+          ctx.strokeStyle = grad; ctx.lineWidth = 2 * dpr;
+          ctx.beginPath(); ctx.moveTo(sh.x, sh.y); ctx.lineTo(tx, ty); ctx.stroke();
+          ctx.fillStyle = 'rgba(255,255,255,' + sh.a + ')';
+          ctx.beginPath(); ctx.arc(sh.x, sh.y, 1.8 * dpr, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      var last = performance.now();
+      function loop(now) {
+        if (!running) return;
+        var dt = Math.min(0.033, (now - last) / 1000);
+        last = now;
+        step(dt);
+        draw();
+        requestAnimationFrame(loop);
+      }
+
+      var media = window.matchMedia('(prefers-reduced-motion: reduce)');
+      function start() {
+        running = !media.matches;
+        resizeStars();
+        if (running) { last = performance.now(); requestAnimationFrame(loop); } else { draw(); }
+      }
+
+      window.addEventListener('resize', resizeStars);
+      if (media.addEventListener) media.addEventListener('change', start); else media.addListener(start);
+      start();
+    }
+  })();
+  </script>
+</body>
+</html>
+
+
+
