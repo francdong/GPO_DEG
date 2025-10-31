@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<title>Grafico Catena del Valore Personalizzato</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #0b0f1a;
+    color: #e5e7eb;
+    background-image:
+      /* velatura lineare unificante (prima per fondere bene) */
+      linear-gradient(120deg, rgba(21,24,38,0.55) 0%, rgba(14,18,30,0.22) 60%, rgba(11,15,26,0.10) 100%),
+      /* alone blu molto ampio e progressivo (più presenza) */
+      radial-gradient(100rem 80rem at 72% 12%, rgba(59,130,246,0.22) 0%, rgba(59,130,246,0.13) 30%, rgba(59,130,246,0.06) 55%, rgba(59,130,246,0.03) 72%, transparent 88%),
+      /* alone azzurro/teal molto ampio e progressivo (più presenza) */
+      radial-gradient(95rem 75rem at 18% 88%, rgba(14,165,233,0.20) 0%, rgba(14,165,233,0.12) 32%, rgba(14,165,233,0.06) 58%, rgba(14,165,233,0.03) 76%, transparent 90%);
+    background-attachment: fixed;
+  }
+
+  @keyframes circuitsPulse {
+    from { opacity: 0.28; }
+    to   { opacity: 0.42; }
+  }
+
+  /* Overlay esagonale tenue sullo sfondo */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(1000px 600px at 50% -10%, rgba(59,130,246,0.11), transparent 65%),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="52" viewBox="0 0 52 45"><path d="M13 1 L39 1 L51 22.5 L39 44 L13 44 L1 22.5 Z" fill="none" stroke="%233b82f633" stroke-width="1"/></svg>');
+    background-size: cover, 60px 52px;
+    filter: drop-shadow(0 0 5px rgba(59,130,246,0.28));
+    opacity: 0.28;
+    pointer-events: none;
+  }
+
+  /* Vignettatura soffusa per eliminare stacchi netti ai bordi */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      /* noise leggerissimo per spezzare il banding */
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" stitchTiles="stitch"/></filter><rect width="120" height="120" filter="url(%23n)" opacity="0.025"/></svg>') repeat,
+      radial-gradient(120rem 80rem at 50% 50%, rgba(0,0,0,0) 62%, rgba(0,0,0,0.28) 100%);
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+  }
+
+  .bg-overlay {
+    position: fixed; inset: 0; z-index: -2;
+    background: linear-gradient(180deg,
+      rgba(15,23,42,0.55) 0%,
+      rgba(15,23,42,0.38) 40%,
+      rgba(15,23,42,0.55) 100%);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+
+  .bg-spotlight {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background: radial-gradient(60rem 40rem at 50% 35%,
+      rgba(255,255,255,0.20) 0%,
+      rgba(255,255,255,0) 65%);
+  }
+
+  /* Circuiti luminosi sullo sfondo (linee diagonali) */
+  .bg-circuits {
+    position: fixed;
+    inset: 0;
+    z-index: -5;
+    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(120deg, rgba(96,165,250,0.08) 0 1px, transparent 1px 22px),
+      repeating-linear-gradient(300deg, rgba(45,212,191,0.07) 0 1px, transparent 1px 26px);
+    background-size: 200% 200%;
+    animation: circuitsMove 30s linear infinite, circuitsPulse 8s ease-in-out infinite alternate;
+    mix-blend-mode: lighten;
+    opacity: 0.35;
+  }
+
+  @keyframes circuitsMove {
+    0%   { background-position:   0%   0%,   0%   0%; }
+    100% { background-position: 200% 200%, -200% -200%; }
+  }
+
+  /* Onde morbide stile mare (layer sotto) */
+  .bg-waves {
+    position: fixed;
+    inset: 0;
+    z-index: -4;
+    pointer-events: none;
+    overflow: hidden;
+    mix-blend-mode: screen;
+  }
+  .bg-waves svg {
+    position: absolute;
+    bottom: -8%;
+    left: 0;
+    width: 200%;
+    height: 60%;
+    opacity: 0.4;
+    filter: blur(7px) saturate(1.1);
+  }
+  .bg-waves .layer1 { animation: wave1 32s linear infinite; }
+  .bg-waves .layer2 { animation: wave2 44s linear infinite; opacity: 0.34; }
+  .bg-waves .layer3 { animation: wave3 60s linear infinite; opacity: 0.28; }
+
+  @keyframes wave1 { from { transform: translateX(0); } to { transform: translateX(-25%); } }
+  @keyframes wave2 { from { transform: translateX(-10%); } to { transform: translateX(10%); } }
+  @keyframes wave3 { from { transform: translateX(0); } to { transform: translateX(-15%); } }
+
+  /* Contenitore principale */
+  .value-chain-container {
+    --triangle-width: 130px;
+    max-width: 900px;
+    margin: auto;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr var(--triangle-width);
+    grid-auto-rows: auto;
+    column-gap: 16px;
+    row-gap: 12px;
+    align-items: start;
+  }
+
+  /* Overlay per diminuire la luminosità del contenuto */
+  .value-chain-container::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    /* Copre solo la colonna contenuto (colonna 1) lasciando libera la colonna triangolo */
+    width: calc(100% - var(--triangle-width) - 16px);
+    pointer-events: none;
+    background: rgba(0,0,0,0.18); /* intensità dim: aumenta per scurire */
+    mix-blend-mode: multiply;
+    border-radius: 0; /* adatta se servono angoli arrotondati */
+    z-index: 0;
+  }
+
+  /* Assicura che il contenuto resti sopra l'overlay */
+  .value-chain-container > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Stage centrato per evitare flash prima dello script */
+  .stage {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  /* Sezione rettangolo azzurro in alto */
+  .top-section {
+    background-color: #0f172a; /* dark card */
+    border: 1px solid #a855f7; /* violet */
+    padding: 5px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.3;
+    display: grid;
+    grid-template-rows: repeat(5, auto);
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+    box-shadow: 0 0 10px rgba(168,85,247,0.25), inset 0 0 6px rgba(124,58,237,0.15);
+  }
+
+  .top-section div {
+    border-bottom: 1px solid rgba(167,139,250,0.35); /* violet divider */
+    padding: 4px 0;
+  }
+
+  /* Ultima riga senza bordo inferiore */
+  .top-section div:last-child {
+    border-bottom: none;
+    font-weight: bold;
+  }
+
+  /* Riga che contiene la sezione centrale e il triangolo */
+  .middle-row {
+    position: relative;
+    width: 100%;
+    margin-top: 0;
+    grid-column: 1;
+  }
+
+  /* Sezione centrale (solo attività) */
+  .middle-section {
+    width: 100%;
+    margin: 0;
+    grid-column: 1;
+  }
+
+  /* Colonna attività primarie (sezione gialla/arancione) */
+  .primary-activities {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    width: 100%;
+  }
+
+  .activity-box {
+    padding: 10px;
+    font-size: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+    min-height: 80px;
+    color: #e5e7eb;
+    box-shadow: 0 0 6px rgba(124,58,237,0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .activity-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 14px rgba(168,85,247,0.35);
+    border-color: rgba(167,139,250,0.6);
+  }
+
+  /* Shimmer diagonale sui box in hover */
+  .activity-box::after {
+    content: "";
+    position: absolute;
+    top: -20%;
+    left: -120px;
+    width: 60px;
+    height: 140%;
+    transform: rotate(18deg);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.24), transparent);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .activity-box:hover::after {
+    animation: shimmer 0.9s ease forwards;
+    opacity: 1;
+  }
+
+  @keyframes shimmer {
+    0%   { left: -120px; opacity: 0; }
+    10%  { opacity: 1; }
+    100% { left: 120%; opacity: 0; }
+  }
+
+  /* Colori specifici per ogni cella */
+  .activity1 {
+    background-color: #0f2a3a; /* travel slate */
+    border-right: none;
+  }
+
+  .activity2 {
+    background-color: #0e2740; /* travel navy */
+    border-right: none;
+  }
+
+  .activity3 {
+    background-color: #0a3450; /* travel blue */
+    border-right: none;
+  }
+
+  .activity4 {
+    background-color: #0a3f5a; /* travel teal-blue */
+    border-right: none;
+  }
+
+  .activity5 {
+    background-color: #084a63; /* travel deep teal */
+  }
+
+  /* Divisione in righe, per il secondo blocco (la seconda riga nel contenuto centrale) */
+  .activity-box p {
+    margin: 5px 0;
+  }
+
+  /* Freccia (colonna dedicata in griglia) */
+  .margin-arrow {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: stretch;
+    width: var(--triangle-width);
+    height: 100%;
+    background: linear-gradient(180deg, #06B6D4 0%, #1D4ED8 100%);
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+    box-shadow: 0 0 16px rgba(6,182,212,0.45), 0 0 28px rgba(29,78,216,0.35);
+    animation: neonPulse 5s ease-in-out infinite;
+    position: relative;
+  }
+
+  @keyframes neonPulse {
+    0%, 100% { filter: saturate(1.0) brightness(1.0); box-shadow: 0 0 16px rgba(6,182,212,0.40), 0 0 28px rgba(29,78,216,0.28); }
+    50%      { filter: saturate(1.08) brightness(1.05); box-shadow: 0 0 22px rgba(29,78,216,0.46), 0 0 36px rgba(6,182,212,0.42); }
+  }
+
+  /* Testo inclinato sulla freccia */
+  .margin-arrow span {
+    position: absolute;
+    top: 50%;
+    left: 28px;
+    transform: translateY(-50%) rotate(45deg);
+    color: #f5f5f5;
+    font-weight: bold;
+    font-size: 16px;
+    white-space: nowrap;
+  }
+
+  /* Sezione include la barra verde 'Attività primarie' con freccia */
+  .activities-label {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    width: 100%;
+    grid-column: 1;
+  }
+
+  /* Variante top della label: sopra le attività, con freccia a destra */
+  .activities-top {
+    margin-top: 0;
+    margin-bottom: 8px;
+    grid-column: 1;
+    width: 100%;
+  }
+
+  .arrow-right {
+    width: 0;
+    height: 0;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    border-left: 30px solid #1D4ED8; /* blue-600 */
+    margin-left: 8px;
+  }
+
+  .green-arrow {
+    width: 0;
+    height: 0;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    border-right: 30px solid #06B6D4; /* teal */
+    margin-right: 8px;
+  }
+
+  .green-bar {
+    background: linear-gradient(90deg, #06B6D4 0%, #1D4ED8 100%);
+    color: white;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    flex-grow: 1;
+    text-align: center;
+    border-radius: 4px;
+    box-shadow: 0 0 12px rgba(6,182,212,0.35);
+    animation: neonPulse 5s ease-in-out infinite;
+  }
+
+  /* Font display per elementi chiave */
+  .value-chain-container strong,
+  .green-bar,
+  .margin-arrow span {
+    font-family: 'Orbitron', Arial, sans-serif;
+    letter-spacing: 0.5px;
+  }
+
+  /* Sfondo unico: mare + bus in movimento */
+  body { transition: background-color 0.3s ease; }
+  .bg-bus { position: fixed; inset: 0; z-index: -4; pointer-events: none; }
+  .bg-waves { display: block; }
+  .bg-bus svg {
+    position: absolute; left: -20%; bottom: 6%;
+    width: min(720px, 48vw); height: auto;
+    opacity: 0.28; filter: drop-shadow(0 6px 18px rgba(0,0,0,0.35));
+    will-change: transform;
+    transform: translateX(120vw);
+    animation: drive 60s linear infinite;
+  }
+  .bg-bus .bus-body { fill: rgba(15,23,42,0.55); stroke: rgba(59,130,246,0.65); }
+  .bg-bus .bus-window { fill: rgba(14,165,233,0.22); stroke: rgba(59,130,246,0.55); }
+  .bg-bus .bus-accent { stroke: rgba(6,182,212,0.68); }
+  .bg-bus .bus-wheel { fill: rgba(15,23,42,0.85); stroke: rgba(148,163,184,0.55); }
+  .bg-bus .bus-light { fill: rgba(250,204,21,0.42); }
+  .bg-bus .bus-anim { animation: bob 4s ease-in-out infinite; transform-origin: 50% 50%; }
+  .bg-bus .bus-wheel { transform-origin: center; }
+
+  /* Passeggeri (omini) */
+  .bg-bus .pax-body { fill: rgba(59,130,246,0.25); stroke: rgba(59,130,246,0.6); }
+  .bg-bus .pax-head { fill: rgba(148,163,184,0.85); stroke: rgba(59,130,246,0.55); transform-box: fill-box; transform-origin: 50% 100%; animation: headSway 2.8s ease-in-out infinite; }
+  .bg-bus .pax-seat .pax-head { animation-delay: calc(var(--i,0) * 0.3s); }
+  .bg-bus .pax-walk { animation: paxWalk 10s linear infinite; }
+  .bg-bus .pax-walk .pax-head { animation: headSway 1.8s ease-in-out infinite; }
+
+  @keyframes headSway { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(6deg); } }
+  @keyframes paxWalk { 0% { transform: translateX(0); } 40% { transform: translateX(-160px); } 100% { transform: translateX(-160px); } }
+
+  @keyframes drive { from { transform: translateX(120vw); } to { transform: translateX(-60vw); } }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @keyframes wheelSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  /* (Rimosso switcher UI) */
+
+</style>
+</head>
+<body>
+  <div class="bg-overlay" aria-hidden="true"></div>
+  <div class="bg-spotlight" aria-hidden="true"></div>
+  <div class="bg-waves" aria-hidden="true">
+    <svg class="layer1" viewBox="0 0 1200 400" preserveAspectRatio="none">
+      <path d="M0,240 C200,200 300,280 500,240 C700,200 900,280 1200,230 L1200,400 L0,400 Z" fill="rgba(6,182,212,0.12)"/>
+    </svg>
+    <svg class="layer2" viewBox="0 0 1200 400" preserveAspectRatio="none">
+      <path d="M0,260 C220,220 360,300 560,260 C760,220 980,300 1200,250 L1200,400 L0,400 Z" fill="rgba(79,70,229,0.10)"/>
+    </svg>
+    <svg class="layer3" viewBox="0 0 1200 400" preserveAspectRatio="none">
+      <path d="M0,280 C240,240 420,320 640,280 C860,240 1040,320 1200,270 L1200,400 L0,400 Z" fill="rgba(14,165,233,0.10)"/>
+    </svg>
+  </div>
+  
+  <div class="bg-bus" aria-hidden="true">
+    <svg viewBox="0 0 1200 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="gBody" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0%" stop-color="#0f172a" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#0b1222" stop-opacity="0.55"/>
+        </linearGradient>
+      </defs>
+      <g class="bus-anim">
+        <!-- Bus body -->
+        <rect x="80" y="150" rx="22" ry="22" width="900" height="220" fill="url(#gBody)" class="bus-body" stroke-width="4"/>
+        <!-- Upper visor -->
+        <rect x="120" y="170" rx="14" ry="14" width="820" height="70" class="bus-window" stroke-width="3"/>
+        <!-- Windows -->
+        <rect x="150" y="255" width="120" height="70" rx="8" ry="8" class="bus-window" stroke-width="2.5"/>
+        <rect x="290" y="255" width="120" height="70" rx="8" ry="8" class="bus-window" stroke-width="2.5"/>
+        <rect x="430" y="255" width="120" height="70" rx="8" ry="8" class="bus-window" stroke-width="2.5"/>
+        <rect x="570" y="255" width="120" height="70" rx="8" ry="8" class="bus-window" stroke-width="2.5"/>
+        <rect x="710" y="255" width="120" height="70" rx="8" ry="8" class="bus-window" stroke-width="2.5"/>
+        <!-- Door -->
+        <rect x="850" y="235" width="110" height="135" rx="10" ry="10" class="bus-window" stroke-width="2.5"/>
+        <!-- Accents (più decisi, simbolo di forza) -->
+        <path d="M120 220 H 900" class="bus-accent" stroke-width="4" fill="none"/>
+        <path d="M120 330 H 900" class="bus-accent" stroke-width="4" fill="none"/>
+        <!-- Emblema (forza/coraggio) scudetto minimale -->
+        <path d="M190 292 l14 0 l8 11 l-15 22 l-15 -22 z" fill="rgba(245,158,11,0.35)" stroke="rgba(245,158,11,0.6)" stroke-width="1.5"/>
+        <!-- Passeggeri seduti (coordinati interni ai finestrini) -->
+        <g class="pax-seat" style="--i:0" transform="translate(180,300)">
+          <rect class="pax-body" x="-6" y="6" width="18" height="26" rx="4"/>
+          <circle class="pax-head" cx="3" cy="4" r="6"/>
+        </g>
+        <g class="pax-seat" style="--i:1" transform="translate(320,300)">
+          <rect class="pax-body" x="-6" y="6" width="18" height="26" rx="4"/>
+          <circle class="pax-head" cx="3" cy="4" r="6"/>
+        </g>
+        <g class="pax-seat" style="--i:2" transform="translate(460,300)">
+          <rect class="pax-body" x="-6" y="6" width="18" height="26" rx="4"/>
+          <circle class="pax-head" cx="3" cy="4" r="6"/>
+        </g>
+        <g class="pax-seat" style="--i:3" transform="translate(600,300)">
+          <rect class="pax-body" x="-6" y="6" width="18" height="26" rx="4"/>
+          <circle class="pax-head" cx="3" cy="4" r="6"/>
+        </g>
+        <g class="pax-seat" style="--i:4" transform="translate(740,300)">
+          <rect class="pax-body" x="-6" y="6" width="18" height="26" rx="4"/>
+          <circle class="pax-head" cx="3" cy="4" r="6"/>
+        </g>
+        <!-- Passeggero che cammina dal portellone verso il posto -->
+        <g class="pax-walk" transform="translate(900,335)">
+          <rect class="pax-body" x="-7" y="4" width="18" height="28" rx="4"/>
+          <circle class="pax-head" cx="2" cy="1" r="6"/>
+        </g>
+        <!-- Scia/foam mare dietro il bus -->
+        <path d="M60 410 C 120 420, 180 418, 240 410" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="3" stroke-linecap="round"/>
+        <!-- Wheels -->
+        <circle cx="240" cy="400" r="55" class="bus-wheel" stroke-width="5"/>
+        <circle cx="720" cy="400" r="55" class="bus-wheel" stroke-width="5"/>
+        
+        <!-- Lights -->
+        <rect x="80" y="300" width="18" height="28" rx="6" ry="6" class="bus-light"/>
+        <rect x="980" y="300" width="18" height="28" rx="6" ry="6" class="bus-light"/>
+      </g>
+    </svg>
+  </div>
+  <div class="stage">
+    <div class="value-chain-container">
+    <!-- Rettangolo azzurro in alto con righe -->
+    <div class="top-section">
+      <div>Creare l'agenzia</div>
+      <div>Selezionare personale e autisti - 25.000 €</div>
+      <div>Acquisto di due bus usati: Mercedes e Setra -105.000€</div>
+      <div>Destinare 20.00€ per accordi con hotel e deposito bus</div>
+      <div style="font-weight:bold;">Approvvigionamenti</div>
+    </div>
+
+    <!-- Barra superiore con freccia opposta -->
+    <div class="activities-label activities-top">
+      <div class="green-bar">Attività di supporto</div>
+      <div class="arrow-right"></div>
+    </div>
+
+    <!-- Sezione centrale attività primarie -->
+    <div class="middle-row">
+      <div class="middle-section">
+        <div class="primary-activities">
+          <div class="activity-box activity1">
+          <strong>Ottenere licenze e permessi</strong><br>
+          per passeggeri, + assicurare bus e attività con polizze adeguate -10.000€
+          </div>
+          <div class="activity-box activity2">
+          <strong>Gestione e manutenzione</strong><br>
+          -10.000€, preparare e aggiornare offerte e pacchetti viaggio (bus+hotel+personalizzazioni varie)
+          </div>
+          <div class="activity-box activity3">
+          <strong>Lancio servizi Move&Rest</strong><br>
+          marketing e vendite (sito web,campagne pubblicitarie,promozioni,pacchetti viaggio)-15.000€
+          </div>
+          <div class="activity-box activity4">
+          <strong>Verifica di pagamento</strong><br>
+          cliente effettua l'ordine e paga online tramite sito = rilascio promozione o biglietto digitale
+          </div>
+          <div class="activity-box activity5">
+          <strong>Verifica di pagamento</strong><br>
+          verifica di pagamento + pagamento accettato + controllo e gestione recensioni online(monitorato feedback,risposte a clienti)
+          </div>
+        </div>
+      </div>
+      <!-- Freccia blu "Margine" a destra (in colonna 2 della griglia) -->
+      <div class="margin-arrow">
+        <span>Margine</span>
+      </div>
+
+      <!-- Barra verde Attività primarie -->
+      <div class="activities-label">
+        <div class="green-arrow"></div>
+        <div class="green-bar">Attività primarie</div>
+      </div>
+    </div>
+  </div>
+  </div>
+  
+  <script>
+  (function() {
+    // Adatta posizione testo triangolo al nuovo layout a griglia
+    function adjustTriangleLabel() {
+      var arrow = document.querySelector('.margin-arrow');
+      if (!arrow) return;
+      var label = arrow.querySelector('span');
+      if (!label) return;
+      // usa la larghezza dalla CSS var o dal DOM
+      var cs = getComputedStyle(document.querySelector('.value-chain-container'));
+      var varWidth = cs.getPropertyValue('--triangle-width').trim();
+      var base = parseFloat(varWidth);
+      if (!base || isNaN(base)) base = arrow.clientWidth || 130;
+      label.style.left = Math.round(base * 0.22) + 'px';
+    }
+
+    // Centra e scala l'intero diagramma per farlo stare sempre al centro e completamente visibile
+    function fitToViewport() {
+      var stage = document.querySelector('.stage');
+      var container = document.querySelector('.value-chain-container');
+      if (!stage || !container) return;
+      // reset per misurare dimensioni reali
+      var prev = container.style.transform;
+      container.style.transform = 'none';
+      // padding margini minimi
+      var pad = 32; // px
+      var vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+      var vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+      var availW = Math.max(200, vw - pad);
+      var availH = Math.max(200, vh - pad);
+      var cw = container.offsetWidth;
+      var ch = container.offsetHeight;
+      var scale = Math.min(availW / cw, availH / ch, 1);
+      container.style.transform = 'scale(' + scale.toFixed(3) + ')';
+      container.style.transformOrigin = 'center center';
+      // dimensiona lo stage per centrare
+      stage.style.minHeight = '100vh';
+      stage.style.display = 'flex';
+      stage.style.alignItems = 'center';
+      stage.style.justifyContent = 'center';
+      stage.style.padding = '16px';
+      // ripristina se necessario
+      if (!prev) return; // manteniamo nuovo transform
+    }
+
+    function onReady() {
+      adjustTriangleLabel();
+      fitToViewport();
+      try {
+        var mode = document.body.getAttribute('data-bg') || 'gradient';
+        document.body.setAttribute('data-bg', mode);
+        var sw = document.querySelector('.bg-switcher');
+        if (sw) {
+          sw.addEventListener('click', function(e) {
+            var btn = e.target.closest('button[data-setbg]');
+            if (!btn) return;
+            var m = btn.getAttribute('data-setbg');
+            if (!m) return;
+            document.body.setAttribute('data-bg', m);
+            sw.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-pressed', String(b===btn)); });
+          });
+        }
+      } catch (err) {}
+    }
+
+    window.addEventListener('DOMContentLoaded', onReady);
+    window.addEventListener('load', onReady);
+    window.addEventListener('resize', fitToViewport);
+  })();
+  </script>
+</body>
+</html>
+
+
+
