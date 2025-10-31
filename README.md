@@ -5,5 +5,6 @@ Gestione Progetto e Organizzazione di Impresa
    
 3. https://francdong.github.io/GPO_DEG/Porter3
 4. https://francdong.github.io/GPO_DEG/Porter3_5
-5. https://docs.google.com/presentation/d/1KibsxTCo4sG9UwfuYYRy3xSZX-livwudG0AqeyBoClA/edit?usp=sharing
+5. 
+6. https://docs.google.com/presentation/d/1KibsxTCo4sG9UwfuYYRy3xSZX-livwudG0AqeyBoClA/edit?usp=sharing
    
