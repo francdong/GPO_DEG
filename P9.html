@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<title>Grafico Catena del Valore Personalizzato</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #0b0f1a;
+    color: #e5e7eb;
+    background-image:
+      linear-gradient(120deg, rgba(21,24,38,0.55) 0%, rgba(14,18,30,0.22) 60%, rgba(11,15,26,0.10) 100%),
+      radial-gradient(100rem 80rem at 72% 12%, rgba(59,130,246,0.22) 0%, rgba(59,130,246,0.13) 30%, rgba(59,130,246,0.06) 55%, rgba(59,130,246,0.03) 72%, transparent 88%),
+      radial-gradient(95rem 75rem at 18% 88%, rgba(14,165,233,0.20) 0%, rgba(14,165,233,0.12) 32%, rgba(14,165,233,0.06) 58%, rgba(14,165,233,0.03) 76%, transparent 90%);
+    background-attachment: fixed;
+  }
+
+  @keyframes circuitsPulse {
+    from { opacity: 0.28; }
+    to   { opacity: 0.42; }
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(1000px 600px at 50% -10%, rgba(59,130,246,0.11), transparent 65%),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="52" viewBox="0 0 52 45"><path d="M13 1 L39 1 L51 22.5 L39 44 L13 44 L1 22.5 Z" fill="none" stroke="%233b82f633" stroke-width="1"/></svg>');
+    background-size: cover, 60px 52px;
+    filter: drop-shadow(0 0 5px rgba(59,130,246,0.28));
+    opacity: 0.28;
+    pointer-events: none;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" stitchTiles="stitch"/></filter><rect width="120" height="120" filter="url(%23n)" opacity="0.025"/></svg>') repeat,
+      radial-gradient(120rem 80rem at 50% 50%, rgba(0,0,0,0) 62%, rgba(0,0,0,0.28) 100%);
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+  }
+
+  .bg-overlay {
+    position: fixed; inset: 0; z-index: -2;
+    background: linear-gradient(180deg,
+      rgba(15,23,42,0.55) 0%,
+      rgba(15,23,42,0.38) 40%,
+      rgba(15,23,42,0.55) 100%);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+
+  .bg-spotlight {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background: radial-gradient(60rem 40rem at 50% 35%,
+      rgba(255,255,255,0.20) 0%,
+      rgba(255,255,255,0) 65%);
+  }
+
+  .bg-poster {
+    position: fixed;
+    right: clamp(12px, 3vw, 48px);
+    top: 20%;
+    z-index: -2;
+    width: min(320px, 22vw);
+    aspect-ratio: 3 / 4;
+    opacity: 0.9;
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,0.35));
+    pointer-events: none;
+  }
+
+  .bg-poster svg { width: 100%; height: 100%; display: block; border-radius: 6px; }
+  .bg-poster.img-mode {
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    border-radius: 6px;
+  }
+
+  .poster-embed-btn {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    z-index: 50;
+    font: 600 12px/1.2 Arial, sans-serif;
+    color: #0b1020;
+    background: linear-gradient(90deg,#06B6D4,#1D4ED8);
+    border: none;
+    padding: 8px 10px;
+    border-radius: 6px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+    cursor: pointer;
+  }
+  .poster-embed-btn:hover { filter: brightness(1.05) saturate(1.05); }
+
+  .bg-circuits {
+    position: fixed;
+    inset: 0;
+    z-index: -5;
+    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(120deg, rgba(96,165,250,0.08) 0 1px, transparent 1px 22px),
+      repeating-linear-gradient(300deg, rgba(45,212,191,0.07) 0 1px, transparent 1px 26px);
+    background-size: 200% 200%;
+    animation: circuitsMove 30s linear infinite, circuitsPulse 8s ease-in-out infinite alternate;
+    mix-blend-mode: lighten;
+    opacity: 0.35;
+  }
+
+  @keyframes circuitsMove {
+    0%   { background-position:   0%   0%,   0%   0%; }
+    100% { background-position: 200% 200%, -200% -200%; }
+  }
+
+  .bg-waves {
+    position: fixed;
+    inset: 0;
+    z-index: -5;
+    pointer-events: none;
+    overflow: hidden;
+    mix-blend-mode: screen;
+  }
+  .bg-waves svg {
+    position: absolute;
+    bottom: -8%;
+    left: 0;
+    width: 200%;
+    height: 60%;
+    opacity: 0.4;
+    filter: blur(7px) saturate(1.1);
+  }
+  .bg-waves .layer1 { animation: wave1 32s linear infinite; }
+  .bg-waves .layer2 { animation: wave2 44s linear infinite; opacity: 0.34; }
+  .bg-waves .layer3 { animation: wave3 60s linear infinite; opacity: 0.28; }
+
+  @keyframes wave1 { from { transform: translateX(0); } to { transform: translateX(-25%); } }
+  @keyframes wave2 { from { transform: translateX(-10%); } to { transform: translateX(10%); } }
+  @keyframes wave3 { from { transform: translateX(0); } to { transform: translateX(-15%); } }
+
+  .value-chain-container {
+    --triangle-width: clamp(110px, 18vw, 180px);
+    max-width: 900px;
+    margin: auto;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr var(--triangle-width);
+    grid-auto-rows: auto;
+    column-gap: 16px;
+    row-gap: 12px;
+    align-items: start;
+  }
+
+  .value-chain-container::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: calc(100% - var(--triangle-width) - 16px);
+    pointer-events: none;
+    background: rgba(0,0,0,0.18);
+    mix-blend-mode: multiply;
+    border-radius: 0;
+    z-index: 0;
+  }
+
+  .value-chain-container > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .stage {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .top-section {
+    background-color: #0f172a;
+    border: 1px solid #a855f7;
+    padding: 5px;
+    text-align: center;
+    font-size: clamp(11px, 1.2vw, 14px);
+    line-height: 1.3;
+    display: grid;
+    grid-template-rows: repeat(5, auto);
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+    box-shadow: 0 0 10px rgba(168,85,247,0.25), inset 0 0 6px rgba(124,58,237,0.15);
+  }
+
+  .top-section div {
+    border-bottom: 1px solid rgba(167,139,250,0.35);
+    padding: 4px 0;
+  }
+
+  .top-section div:last-child {
+    border-bottom: none;
+    font-weight: bold;
+  }
+
+  .middle-row {
+    position: relative;
+    width: 100%;
+    margin-top: 0;
+    grid-column: 1;
+  }
+
+  .middle-section {
+    width: 100%;
+    margin: 0;
+    grid-column: 1;
+  }
+
+  .primary-activities {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    width: 100%;
+  }
+
+  .activity-box {
+    padding: 10px;
+    font-size: clamp(10px, 1.05vw, 12px);
+    border: 1px solid rgba(255,255,255,0.08);
+    min-height: 80px;
+    color: #e5e7eb;
+    box-shadow: 0 0 6px rgba(124,58,237,0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .activity-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 14px rgba(168,85,247,0.35);
+    border-color: rgba(167,139,250,0.6);
+  }
+
+  .activity-box::after {
+    content: "";
+    position: absolute;
+    top: -20%;
+    left: -120px;
+    width: 60px;
+    height: 140%;
+    transform: rotate(18deg);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.24), transparent);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .activity-box:hover::after {
+    animation: shimmer 0.9s ease forwards;
+    opacity: 1;
+  }
+
+  @keyframes shimmer {
+    0%   { left: -120px; opacity: 0; }
+    10%  { opacity: 1; }
+    100% { left: 120%; opacity: 0; }
+  }
+
+  .activity1 { background-color: #0f2a3a; border-right: none; }
+  .activity2 { background-color: #0e2740; border-right: none; }
+  .activity3 { background-color: #0a3450; border-right: none; }
+  .activity4 { background-color: #0a3f5a; border-right: none; }
+  .activity5 { background-color: #084a63; }
+
+  .activity-box p { margin: 5px 0; }
+
+  .margin-arrow {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: stretch;
+    width: var(--triangle-width);
+    height: calc(100% + 260px);
+    margin-top: 60px;
+    background: linear-gradient(180deg, #06B6D4 0%, #1D4ED8 100%);
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+    box-shadow: 0 0 16px rgba(6,182,212,0.45), 0 0 28px rgba(29,78,216,0.35);
+    animation: neonPulse 5s ease-in-out infinite;
+    position: relative;
+  }
+
+  @keyframes neonPulse {
+    0%, 100% { filter: saturate(1.0) brightness(1.0); box-shadow: 0 0 16px rgba(6,182,212,0.40), 0 0 28px rgba(29,78,216,0.28); }
+    50%      { filter: saturate(1.08) brightness(1.05); box-shadow: 0 0 22px rgba(29,78,216,0.46), 0 0 36px rgba(6,182,212,0.42); }
+  }
+
+  .margin-arrow span {
+    position: absolute;
+    top: 50%;
+    left: 28px;
+    transform: translateY(-50%) rotate(45deg);
+    color: #f5f5f5;
+    font-weight: bold;
+    font-size: clamp(12px, 1.1vw, 16px);
+    white-space: nowrap;
+  }
+
+  .activities-label {
+    display: flex;
+    align-items: center;
+    margin-top: -26px;
+    width: 100%;
+    grid-column: 1;
+  }
+
+  .activities-top {
+    margin-top: 0;
+    margin-bottom: 8px;
+    grid-column: 1;
+    width: 100%;
+  }
+
+  .arrow-right {
+    width: 0;
+    height: 0;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    border-left: 30px solid #1D4ED8;
+    margin-left: 8px;
+  }
+
+  .green-arrow {
+    width: 0;
+    height: 0;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    border-right: 30px solid #06B6D4;
+    margin-right: 8px;
+  }
+
+  .green-bar {
+    background: linear-gradient(90deg, #06B6D4 0%, #1D4ED8 100%);
+    color: white;
+    padding: 8px;
+    font-weight: bold;
+    font-size: clamp(12px, 1.15vw, 14px);
+    flex-grow: 1;
+    text-align: center;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 2px rgba(167,139,250,0.45), 0 0 12px rgba(6,182,212,0.35);
+    animation: neonPulse 5s ease-in-out infinite;
+  }
+
+  .value-chain-container strong,
+  .green-bar,
+  .margin-arrow span {
+    font-family: 'Orbitron', Arial, sans-serif;
+    letter-spacing: 0.5px;
+  }
+
+  body { transition: background-color 0.3s ease; }
+  .bg-bus { position: fixed; inset: 0; z-index: -3; pointer-events: none; }
+  .bg-stop { position: fixed; inset: 0; z-index: -4; pointer-events: none; }
+  .bg-stop #stop-pole { pointer-events: all; }
+  .bg-stop svg { position: absolute; left: 48%; bottom: 180px; transform: translate(-50%, 0) scale(1.45); opacity: 1; }
+  .bg-waves { display: block; }
+  .bg-bus svg {
+    position: absolute; left: -20%; bottom: 2%;
+    width: min(960px, 60vw); height: auto;
+    filter: drop-shadow(0 6px 18px rgba(0,0,0,0.35));
+    will-change: transform;
+    transform: translateX(-60vw);
+    animation: drive 45s linear infinite;
+  }
+  .bg-bus svg.bus-centered { left: 50% !important; transform: translateX(-50%) !important; }
+  .bg-bus .bus-body { fill: rgba(15,23,42,0.95); stroke: rgba(59,130,246,0.75); }
+  .bg-bus .bus-window { fill: rgba(14,165,233,0.75); stroke: rgba(59,130,246,0.65); }
+  .bg-bus .bus-accent { stroke: rgba(6,182,212,0.68); }
+  .bg-bus .bus-wheel { fill: rgba(15,23,42,0.85); stroke: rgba(148,163,184,0.55); }
+  .bg-bus .bus-light { fill: rgba(250,204,21,0.42); }
+  .bg-bus .bus-anim { animation: bob 4s ease-in-out infinite; transform-origin: 50% 50%; }
+  .bg-bus .bus-wheel { transform-origin: center; }
+  .bg-bus .bus-trim { stroke: rgba(148,163,184,0.55); stroke-width: 3; fill: none; opacity: 0.75; stroke-linecap: round; }
+  .bg-bus .bus-trim-thin { stroke: rgba(148,163,184,0.45); stroke-width: 2; fill: none; opacity: 0.7; stroke-linecap: round; }
+  .bg-bus .wheel-arch { stroke: rgba(148,163,184,0.55); stroke-width: 3.5; fill: none; opacity: 0.6; }
+  .bg-bus .bus-ear { fill: rgba(0,0,0,0.45); stroke: rgba(59,130,246,0.5); stroke-width: 2; }
+
+  #stop-pole { cursor: pointer; }
+  .paused { animation-play-state: paused !important; }
+  .bg-stop .waiting.boarding-now { opacity: 0; transition: opacity 1.2s ease; }
+
+  .bg-bus .pax-body { fill: rgba(59,130,246,0.25); stroke: rgba(59,130,246,0.6); }
+  .bg-bus .pax-head { fill: rgba(148,163,184,0.85); stroke: rgba(59,130,246,0.55); transform-box: fill-box; transform-origin: 50% 100%; animation: headSway 2.8s ease-in-out infinite; }
+  .bg-bus .pax-seat .pax-head { animation-delay: calc(var(--i,0) * 0.3s); }
+  .bg-bus .pax-walk { animation: paxWalk 10s linear infinite; }
+  .bg-bus .pax-walk .pax-head { animation: headSway 1.8s ease-in-out infinite; }
+
+  .bg-bus .pax-seat, .bg-bus .pax-walk { opacity: 0; animation: paxShow 0.6s ease forwards; animation-delay: 0.6s; }
+  @keyframes paxShow { from { opacity: 0; } to { opacity: 1; } }
+
+  .bg-bus .pax-new { opacity: 0; animation: paxBoard 45s linear infinite; }
+  @keyframes paxBoard { 0%,54% { opacity: 0; } 60%,100% { opacity: 1; } }
+
+  @keyframes headSway { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(6deg); } }
+  @keyframes paxWalk { 0% { transform: translateX(0); } 40% { transform: translateX(-160px); } 100% { transform: translateX(-160px); } }
+
+  @keyframes drive {
+    0%   { left: -20%; transform: translateX(-60vw); }
+    50%  { left: 50%;  transform: translateX(-50%); }
+    60%  { left: 50%;  transform: translateX(-50%); }
+    100% { left: -20%; transform: translateX(110vw); }
+  }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @keyframes wheelSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  .bg-stop .waiting { animation: waitingBoard 45s linear infinite; }
+  @keyframes waitingBoard {
+    0%   { opacity: 1; }
+    54%  { opacity: 1; }
+    60%  { opacity: 0; }
+    90%  { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  .bg-sakura { position: fixed; inset: 0; z-index: -4; pointer-events: none; }
+  .bg-sakura svg { position: absolute; left: 12%; bottom: 110px; width: min(360px, 28vw); height: auto; opacity: 0.95; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.35)); }
+  .sakura-petal { transform-origin: center; animation: petalFall var(--dur,12s) linear infinite; opacity: var(--op,0.85); }
+  .sakura-canopy { filter: url(#softBlur); opacity: 0.92; }
+  .sakura-drift { animation: canopySway 7s ease-in-out infinite alternate; transform-origin: 40% 70%; }
+  .sakura-drip { opacity: 0.75; filter: url(#softBlur); }
+  /* Wind-blown petals and ground lift-off */
+  .wind-petal { animation: blow var(--dur, 12s) linear infinite; transform-origin: center; opacity: var(--op, 0.9); }
+  .ground-petal { opacity: 0.95; transform-origin: center; }
+  .ground-petal.lift { animation: liftOff var(--dur, 6s) ease-in forwards; }
+  @keyframes petalFall {
+    0%   { transform: translate(0, -10px) rotate(0deg); }
+    50%  { transform: translate(-30px, 160px) rotate(120deg); }
+    100% { transform: translate(20px, 320px) rotate(260deg); opacity: 0; }
+  }
+  @keyframes canopySway { 0% { transform: rotate(-1.2deg) translateX(0); } 100% { transform: rotate(1.2deg) translateX(4px); } }
+  @keyframes blow { 0% { transform: translate(0,0) rotate(0deg); } 100% { transform: translate(var(--dx, 220px), var(--dy, 60px)) rotate(var(--rot, 240deg)); opacity: 0; } }
+  @keyframes liftOff {
+    0% { transform: translate(0,0) rotate(0deg); opacity: 1; }
+    30% { transform: translate(calc(var(--dx, 140px) * 0.3), -20px) rotate(80deg); }
+    100% { transform: translate(var(--dx, 140px), var(--dy, 50px)) rotate(220deg); opacity: 0; }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 1024px) {
+    .value-chain-container { max-width: min(96vw, 980px); }
+    .top-section { font-size: 13px; }
+    .activity-box { min-height: 72px; }
+    .bg-bus svg { width: min(880px, 80vw); }
+  }
+
+  @media (max-width: 768px) {
+    .value-chain-container { column-gap: 12px; row-gap: 10px; }
+    .top-section { font-size: 12px; }
+    .activity-box { font-size: 11px; padding: 8px; }
+    .green-bar { font-size: 13px; }
+    .bg-bus svg { width: min(820px, 88vw); bottom: 1%; }
+    .bg-stop svg { transform: translate(-50%, 0) scale(1.25); }
+    .bg-sakura svg { left: 10%; width: min(320px, 36vw); }
+  }
+
+  @media (max-width: 560px) {
+    .value-chain-container { --triangle-width: clamp(84px, 22vw, 140px); }
+    .stage { padding: 8px; }
+    .top-section { font-size: 11px; }
+    .activity-box { font-size: 10.5px; padding: 8px; }
+    .green-bar { font-size: 12px; }
+    .margin-arrow { margin-top: -70px; height: calc(100% + 220px); }
+    .margin-arrow span { left: 22px; font-size: 14px; }
+    .bg-bus svg { width: 92vw; }
+    .bg-stop svg { transform: translate(-50%, 0) scale(1.1); bottom: 160px; }
+    .bg-poster { display: none; }
+    .bg-sakura svg { left: 8%; width: min(280px, 48vw); }
+  }
+
+  @media (max-width: 400px) {
+    .top-section { font-size: 10.5px; }
+    .activity-box { font-size: 10px; padding: 6px; }
+    .margin-arrow span { font-size: 13px; }
+  }
+
+</style>
+</head>
+<body data-poster-path="https://i.ebayimg.com/images/g/x20AAOSwia9g9jvd/s-l400.jpg">
+  <div class="bg-overlay" aria-hidden="true"></div>
+  <div class="bg-spotlight" aria-hidden="true"></div>
+  <div class="bg-poster" aria-hidden="true"></div>
+  <script id="poster-data" type="application/json">""</script>
+  <button class="poster-embed-btn" type="button" title="Incorpora poster nel file (offline)">Incorpora poster</button>
+  <div class="bg-waves" aria-hidden="true">
+    <svg class="layer1" viewBox="0 0 1200 400" preserveAspectRatio="none">
+      <path d="M0,240 C200,200 300,280 500,240 C700,200 900,280 1200,230 L1200,400 L0,400 Z" fill="rgba(6,182,212,0.12)"/>
+    </svg>
+    <svg class="layer2" viewBox="0 0 1200 400" preserveAspectRatio="none">
+      <path d="M0,260 C220,220 360,300 560,260 C760,220 980,300 1200,250 L1200,400 L0,400 Z" fill="rgba(59,130,246,0.10)"/>
+    </svg>
+    <svg class="layer3" viewBox="0 0 1200 400" preserveAspectRatio="none">
+      <path d="M0,280 C240,240 420,320 640,280 C860,240 1040,320 1200,270 L1200,400 L0,400 Z" fill="rgba(14,165,233,0.10)"/>
+    </svg>
+  </div>
+  <div class="bg-stop" aria-hidden="true">
+    <svg viewBox="0 0 1200 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g transform="translate(600, 440)">
+        <rect x="-20" y="-60" width="280" height="8" fill="rgba(59,130,246,0.6)"/>
+        <rect x="-18" y="-60" width="6" height="120" fill="rgba(148,163,184,0.6)"/>
+        <rect x="258" y="-60" width="6" height="120" fill="rgba(148,163,184,0.6)"/>
+        <rect x="-18" y="-12" width="272" height="6" fill="rgba(59,130,246,0.35)"/>
+        <rect x="10" y="10" width="160" height="10" rx="3" fill="rgba(59,130,246,0.4)"/>
+        <rect x="18" y="20" width="6" height="20" fill="rgba(148,163,184,0.6)"/>
+        <rect x="154" y="20" width="6" height="20" fill="rgba(148,163,184,0.6)"/>
+        <g id="stop-pole" transform="translate(-40, -20)">
+          <rect x="-3" y="0" width="6" height="80" fill="rgba(148,163,184,0.7)"/>
+          <circle cx="0" cy="-16" r="14" fill="rgba(6,182,212,0.6)" stroke="rgba(59,130,246,0.6)"/>
+        </g>
+        <g class="waiting">
+          <g transform="translate(60,0)">
+            <rect x="-6" y="16" width="16" height="26" rx="5" fill="rgba(59,130,246,0.25)" stroke="rgba(59,130,246,0.6)"/>
+            <circle cx="2" cy="10" r="6" fill="rgba(148,163,184,0.85)" stroke="rgba(59,130,246,0.55)"/>
+          </g>
+          <g transform="translate(95,0)">
+            <rect x="-6" y="16" width="16" height="26" rx="5" fill="rgba(59,130,246,0.25)" stroke="rgba(59,130,246,0.6)"/>
+            <circle cx="2" cy="10" r="6" fill="rgba(148,163,184,0.85)" stroke="rgba(59,130,246,0.55)"/>
+          </g>
+          <g transform="translate(130,0)">
+            <rect x="-6" y="16" width="16" height="26" rx="5" fill="rgba(59,130,246,0.25)" stroke="rgba(59,130,246,0.6)"/>
+            <circle cx="2" cy="10" r="6" fill="rgba(148,163,184,0.85)" stroke="rgba(59,130,246,0.55)"/>
+          </g>
+        </g>
+      </g>
+    </svg>
+  </div>
+  
+  <div class="bg-sakura" aria-hidden="true">
+    <svg viewBox="0 0 420 540" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bark" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stop-color="#2b1e18"/>
+          <stop offset="100%" stop-color="#4b332b"/>
+        </linearGradient>
+        <radialGradient id="petal" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ffe2ef"/>
+          <stop offset="100%" stop-color="#f472b6"/>
+        </radialGradient>
+        <filter id="softBlur" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="3"/>
+        </filter>
+        <linearGradient id="dripG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f9a8d4" stop-opacity="0.85"/>
+          <stop offset="100%" stop-color="#f472b6" stop-opacity="0.0"/>
+        </linearGradient>
+      </defs>
+      <g class="sakura-drift" transform="translate(30, 40)">
+        <!-- Leaning trunk -->
+        <path d="M130 420 C 128 360 160 330 146 280 C 132 230 155 200 150 160 C 145 120 165 95 205 86" fill="none" stroke="url(#bark)" stroke-width="20" stroke-linecap="round"/>
+        <!-- main branches -->
+        <path d="M150 260 C 200 220 260 210 320 185" fill="none" stroke="url(#bark)" stroke-width="12" stroke-linecap="round"/>
+        <path d="M148 210 C 120 190 98 170 72 152" fill="none" stroke="url(#bark)" stroke-width="10" stroke-linecap="round"/>
+
+        <!-- painterly canopy blobs -->
+        <g class="sakura-canopy">
+          <ellipse cx="280" cy="150" rx="90" ry="52" fill="#f9a8d4" opacity="0.85"/>
+          <ellipse cx="210" cy="150" rx="85" ry="55" fill="#fda4af" opacity="0.9"/>
+          <ellipse cx="150" cy="160" rx="70" ry="48" fill="#f9a8d4" opacity="0.9"/>
+          <ellipse cx="325" cy="165" rx="70" ry="42" fill="#fda4af" opacity="0.8"/>
+          <ellipse cx="240" cy="175" rx="95" ry="45" fill="#fbcfe8" opacity="0.8"/>
+          <!-- soft edges -->
+          <path d="M90 160 C 140 110 210 100 280 120 C 340 135 380 160 360 190 C 340 220 290 230 230 220 C 170 210 120 200 100 185 C 85 175 78 172 90 160 Z" fill="#f9a8d4" opacity="0.75"/>
+        </g>
+
+        <!-- vertical drips under canopy -->
+        <g class="sakura-drip">
+          <rect x="270" y="180" width="6" height="36" rx="3" fill="url(#dripG)"/>
+          <rect x="300" y="186" width="5" height="44" rx="3" fill="url(#dripG)"/>
+          <rect x="225" y="188" width="5" height="30" rx="3" fill="url(#dripG)"/>
+          <rect x="180" y="182" width="6" height="40" rx="3" fill="url(#dripG)"/>
+          <rect x="135" y="186" width="5" height="34" rx="3" fill="url(#dripG)"/>
+        </g>
+
+        <!-- clustered blossoms on edges -->
+        <g fill="#fecdd3" opacity="0.95">
+          <circle cx="320" cy="150" r="7"/>
+          <circle cx="300" cy="162" r="6"/>
+          <circle cx="340" cy="162" r="6"/>
+          <circle cx="205" cy="132" r="6"/>
+          <circle cx="170" cy="156" r="7"/>
+          <circle cx="140" cy="168" r="6"/>
+          <circle cx="110" cy="160" r="6"/>
+          <circle cx="252" cy="142" r="6"/>
+        </g>
+
+        <!-- falling petals -->
+        <g>
+          <g class="sakura-petal" style="--dur: 12s; --op:0.9" transform="translate(320,150)">
+            <path d="M0 -8 C 4 -10, 8 -6, 6 -2 C 10 0, 6 6, 0 8 C -6 6, -10 0, -6 -2 C -8 -6, -4 -10, 0 -8 Z" fill="url(#petal)"/>
+          </g>
+          <g class="sakura-petal" style="--dur: 14s; --op:0.85" transform="translate(280,165)">
+            <path d="M0 -7 C 3 -9, 7 -5, 5 -2 C 9 0, 5 5, 0 7 C -5 5, -9 0, -5 -2 C -7 -5, -3 -9, 0 -7 Z" fill="url(#petal)"/>
+          </g>
+          <g class="sakura-petal" style="--dur: 16s; --op:0.8" transform="translate(240,160)">
+            <path d="M0 -7 C 3 -9, 7 -5, 5 -2 C 9 0, 5 5, 0 7 C -5 5, -9 0, -5 -2 C -7 -5, -3 -9, 0 -7 Z" fill="url(#petal)"/>
+          </g>
+          <g class="sakura-petal" style="--dur: 11s; --op:0.9" transform="translate(200,150)">
+            <path d="M0 -6 C 3 -8, 6 -4, 5 -2 C 8 0, 5 4, 0 6 C -5 4, -8 0, -5 -2 C -6 -4, -3 -8, 0 -6 Z" fill="url(#petal)"/>
+          </g>
+          <g class="sakura-petal" style="--dur: 18s; --op:0.75" transform="translate(150,170)">
+            <path d="M0 -6 C 3 -8, 6 -4, 5 -2 C 8 0, 5 4, 0 6 C -5 4, -8 0, -5 -2 C -6 -4, -3 -8, 0 -6 Z" fill="url(#petal)"/>
+          </g>
+          <g class="sakura-petal" style="--dur: 15s; --op:0.8" transform="translate(120,175)">
+            <path d="M0 -5 C 2 -7, 5 -4, 4 -2 C 7 0, 4 4, 0 5 C -4 4, -7 0, -4 -2 C -5 -4, -2 -7, 0 -5 Z" fill="url(#petal)"/>
+          </g>
+          <g class="sakura-petal" style="--dur: 13s; --op:0.85" transform="translate(200,135)">
+            <path d="M0 -5 C 2 -7, 5 -4, 4 -2 C 7 0, 4 4, 0 5 C -4 4, -7 0, -4 -2 C -5 -4, -2 -7, 0 -5 Z" fill="url(#petal)"/>
+          </g>
+        </g>
+
+        <!-- wind-blown petals (direction set via CSS vars by JS) -->
+        <g>
+          <g class="wind-petal" style="--dur: 10s; --op:0.9; --rot:260deg" transform="translate(290,150)">
+            <path d="M0 -6 C 3 -8, 6 -4, 5 -2 C 8 0, 5 4, 0 6 C -5 4, -8 0, -5 -2 C -6 -4, -3 -8, 0 -6 Z" fill="url(#petal)"/>
+          </g>
+          <g class="wind-petal" style="--dur: 12s; --op:0.85; --rot:240deg" transform="translate(250,160)">
+            <path d="M0 -6 C 3 -8, 6 -4, 5 -2 C 8 0, 5 4, 0 6 C -5 4, -8 0, -5 -2 C -6 -4, -3 -8, 0 -6 Z" fill="url(#petal)"/>
+          </g>
+          <g class="wind-petal" style="--dur: 9s; --op:0.8; --rot:220deg" transform="translate(210,170)">
+            <path d="M0 -5 C 2 -7, 5 -4, 4 -2 C 7 0, 4 4, 0 5 C -4 4, -7 0, -4 -2 C -5 -4, -2 -7, 0 -5 Z" fill="url(#petal)"/>
+          </g>
+        </g>
+
+        <!-- ground blossoms under trunk -->
+        <g id="ground-blossoms" transform="translate(95, 418)" fill="url(#petal)">
+          <path class="ground-petal" d="M0 -4 C 2 -5, 4 -3, 3 -1 C 5 0, 3 3, 0 4 C -3 3, -5 0, -3 -1 C -4 -3, -2 -5, 0 -4 Z" transform="translate(0,0) rotate(-8)"/>
+          <path class="ground-petal" d="M0 -4 C 2 -5, 4 -3, 3 -1 C 5 0, 3 3, 0 4 C -3 3, -5 0, -3 -1 C -4 -3, -2 -5, 0 -4 Z" transform="translate(18,2) rotate(14)"/>
+          <path class="ground-petal" d="M0 -4 C 2 -5, 4 -3, 3 -1 C 5 0, 3 3, 0 4 C -3 3, -5 0, -3 -1 C -4 -3, -2 -5, 0 -4 Z" transform="translate(34,4) rotate(-22)"/>
+          <path class="ground-petal" d="M0 -4 C 2 -5, 4 -3, 3 -1 C 5 0, 3 3, 0 4 C -3 3, -5 0, -3 -1 C -4 -3, -2 -5, 0 -4 Z" transform="translate(56,1) rotate(10)"/>
+          <path class="ground-petal" d="M0 -4 C 2 -5, 4 -3, 3 -1 C 5 0, 3 3, 0 4 C -3 3, -5 0, -3 -1 C -4 -3, -2 -5, 0 -4 Z" transform="translate(80,3) rotate(-6)"/>
+          <path class="ground-petal" d="M0 -4 C 2 -5, 4 -3, 3 -1 C 5 0, 3 3, 0 4 C -3 3, -5 0, -3 -1 C -4 -3, -2 -5, 0 -4 Z" transform="translate(102,5) rotate(18)"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <div class="bg-bus" aria-hidden="true">
+    <svg viewBox="0 0 1200 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="gBody" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0%" stop-color="#0f172a" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#0b1222" stop-opacity="0.55"/>
+        </linearGradient>
+      </defs>
+      <g class="bus-anim">
+        <rect x="80" y="150" rx="22" ry="22" width="900" height="220" fill="url(#gBody)" class="bus-body" stroke-width="4"/>
+        <path d="M120 212 L120 180 Q 320 160 520 170 T 940 190 L 940 212 Z" class="bus-window" stroke-width="3"/>
+        <path d="M150 255 L270 255 L270 320 L150 320 Z" class="bus-window" stroke-width="2.5"/>
+        <path d="M290 252 L410 250 L410 320 L290 320 Z" class="bus-window" stroke-width="2.5"/>
+        <path d="M430 250 L550 248 L550 320 L430 320 Z" class="bus-window" stroke-width="2.5"/>
+        <path d="M570 248 L690 246 L690 320 L570 320 Z" class="bus-window" stroke-width="2.5"/>
+        <path d="M710 246 L830 246 L830 320 L710 320 Z" class="bus-window" stroke-width="2.5"/>
+        <rect x="840" y="232" width="100" height="138" rx="8" ry="8" class="bus-window" stroke-width="2.5"/>
+        <path d="M120 220 H 900" class="bus-accent" stroke-width="4" fill="none"/>
+        <path d="M120 330 H 900" class="bus-accent" stroke-width="4" fill="none"/>
+        <path d="M190 292 l14 0 l8 11 l-15 22 l-15 -22 z" fill="rgba(245,158,11,0.35)" stroke="rgba(245,158,11,0.6)" stroke-width="1.5"/>
+        <g class="pax-seat" style="--i:0" transform="translate(180,300)">
+          <rect class="pax-body" x="-6" y="6" width="18" height="26" rx="4"/>
+          <circle class="pax-head" cx="3" cy="4" r="6"/>
+        </g>
+        <g class="pax-seat" style="--i:1" transform="translate(320,300)">
+          <rect class="pax-body" x="-6" y="6" width="18" height="26" rx="4"/>
+          <circle class="pax-head" cx="3" cy="4" r="6"/>
+        </g>
+        <g class="pax-seat" style="--i:2" transform="translate(460,300)">
+          <rect class="pax-body" x="-6" y="6" width="18" height="26" rx="4"/>
+          <circle class="pax-head" cx="3" cy="4" r="6"/>
+        </g>
+        <g class="pax-seat" style="--i:3" transform="translate(600,300)">
+          <rect class="pax-body" x="-6" y="6" width="18" height="26" rx="4"/>
+          <circle class="pax-head" cx="3" cy="4" r="6"/>
+        </g>
+        <g class="pax-seat" style="--i:4" transform="translate(740,300)">
+          <rect class="pax-body" x="-6" y="6" width="18" height="26" rx="4"/>
+          <circle class="pax-head" cx="3" cy="4" r="6"/>
+        </g>
+        <g class="pax-seat pax-new" transform="translate(500,300)">
+          <rect class="pax-body" x="-6" y="6" width="18" height="26" rx="4"/>
+          <circle class="pax-head" cx="3" cy="4" r="6"/>
+        </g>
+        <g class="pax-seat pax-new" transform="translate(640,300)">
+          <rect class="pax-body" x="-6" y="6" width="18" height="26" rx="4"/>
+          <circle class="pax-head" cx="3" cy="4" r="6"/>
+        </g>
+        <g class="pax-seat pax-new" transform="translate(780,300)">
+          <rect class="pax-body" x="-6" y="6" width="18" height="26" rx="4"/>
+          <circle class="pax-head" cx="3" cy="4" r="6"/>
+        </g>
+        
+        <path d="M60 410 C 120 420, 180 418, 240 410" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="220" cy="400" r="40" class="bus-wheel" stroke-width="5"/>
+        <circle cx="660" cy="400" r="46" class="bus-wheel" stroke-width="5"/>
+        <circle cx="935" cy="400" r="34" class="bus-wheel" stroke-width="5"/>
+
+        <path d="M950 200 Q 990 210 1000 240 L 1000 340 Q 985 360 950 365 Z" fill="rgba(15,23,42,0.65)" stroke="rgba(59,130,246,0.6)" stroke-width="3"/>
+        <path d="M920 200 L 980 200 L 1000 240 L 920 240 Z" fill="rgba(14,165,233,0.18)" stroke="rgba(59,130,246,0.6)" stroke-width="2.5"/>
+        
+        
+        <path class="bus-trim" d="M120 372 L 191 372"/>
+        <path class="bus-trim" d="M249 372 L 624 372"/>
+        <path class="bus-trim" d="M697 372 L 916 372"/>
+        <path class="bus-trim" d="M954 372 L 1004 370"/>
+        <path class="bus-trim" d="M940 200 L 940 365"/>
+        
+        <path class="bus-trim-thin" d="M140 360 L 205 360"/>
+        <path class="bus-trim-thin" d="M235 360 L 637 360"/>
+        <path class="bus-trim-thin" d="M683 360 L 930 360"/>
+        <path class="bus-trim-thin" d="M948 360 L 990 360"/>
+        
+        <path class="wheel-arch" d="M180 400 A 40 40 0 0 1 260 400"/>
+        <path class="wheel-arch" d="M614 400 A 46 46 0 0 1 706 400"/>
+        <path class="wheel-arch" d="M901 400 A 34 34 0 0 1 969 400"/>
+        
+        <path class="bus-trim" d="M940 368 Q 962 376 984 372 T 1004 360"/>
+        
+        <path class="bus-ear" d="M980 190 q 24 4 32 16 q -8 10 -24 10 q -10 -10 -8 -26 z"/>
+        <path class="bus-ear" d="M930 190 q -18 6 -26 16 q 10 10 24 10 q 10 -10 2 -26 z"/>
+        
+        <rect x="80" y="300" width="18" height="28" rx="6" ry="6" class="bus-light"/>
+        <rect x="980" y="300" width="18" height="28" rx="6" ry="6" class="bus-light"/>
+      </g>
+    </svg>
+  </div>
+  <div class="stage">
+    <div class="value-chain-container">
+    <div class="top-section">
+      <div>Creare l'agenzia</div>
+      <div>Selezionare personale e autisti - 25.000 €</div>
+      <div>Acquisto di due bus usati: Mercedes e Setra -105.000€</div>
+      <div>Destinare 20.00€ per accordi con hotel e deposito bus</div>
+      <div style="font-weight:bold;">Approvvigionamenti</div>
+    </div>
+
+    <div class="activities-label activities-top">
+      <div class="green-bar">Attività di supporto</div>
+      <div class="arrow-right"></div>
+    </div>
+
+    <div class="middle-row">
+      <div class="middle-section">
+        <div class="primary-activities">
+          <div class="activity-box activity1">
+          <strong>Ottenere licenze e permessi</strong><br>
+          10.000€, per passeggeri, + assicurare bus e attività con polizze adeguate
+          </div>
+          <div class="activity-box activity2">
+          <strong>Gestione e manutenzione</strong><br>
+          10.000€, preparare e aggiornare offerte e pacchetti viaggio(bus+hotel+<br>personalizzazioni varie)
+          </div>
+          <div class="activity-box activity3">
+          <strong>Lancio servizi Move&Rest</strong><br>
+          15.000€, marketing e vendite (sito web,campagne pubblicitarie,promozioni,<br>pacchetti viaggio)
+          </div>
+          <div class="activity-box activity4">
+          <strong>Verifica di pagamento</strong><br>
+          cliente effettua l'ordine e paga online tramite sito = rilascio promozione o biglietto digitale
+          </div>
+          <div class="activity-box activity5">
+          <strong>Verifica di pagamento</strong><br>
+          verifica di pagamento + pagamento accettato + controllo e gestione recensioni online(monitorato feedback,risposte a clienti)
+          </div>
+        </div>
+      </div>
+      <div class="margin-arrow">
+        <span>Margine</span>
+      </div>
+
+      <div class="activities-label">
+        <div class="green-arrow"></div>
+        <div class="green-bar">Attività primarie</div>
+      </div>
+    </div>
+  </div>
+  </div>
+  
+  <script>
+  (function() {
+    function adjustTriangleLabel() {
+      var arrow = document.querySelector('.margin-arrow');
+      if (!arrow) return;
+      var label = arrow.querySelector('span');
+      if (!label) return;
+      var cs = getComputedStyle(document.querySelector('.value-chain-container'));
+      var varWidth = cs.getPropertyValue('--triangle-width').trim();
+      var base = parseFloat(varWidth);
+      if (!base || isNaN(base)) base = arrow.clientWidth || 130;
+      label.style.left = Math.round(base * 0.22) + 'px';
+    }
+
+    function fitToViewport() {
+      var stage = document.querySelector('.stage');
+      var container = document.querySelector('.value-chain-container');
+      if (!stage || !container) return;
+      var prev = container.style.transform;
+      container.style.transform = 'none';
+      var pad = 32;
+      var vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+      var vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+      var availW = Math.max(200, vw - pad);
+      var availH = Math.max(200, vh - pad);
+      var cw = container.offsetWidth;
+      var ch = container.offsetHeight;
+      var scale = Math.min(availW / cw, availH / ch, 1);
+      container.style.transform = 'scale(' + scale.toFixed(3) + ')';
+      container.style.transformOrigin = 'center center';
+      stage.style.minHeight = '100vh';
+      stage.style.display = 'flex';
+      stage.style.alignItems = 'center';
+      stage.style.justifyContent = 'center';
+      stage.style.padding = '16px';
+      if (!prev) return;
+    }
+
+    function buildPoster() {
+      var poster = document.querySelector('.bg-poster');
+      if (!poster) return;
+      if (poster.dataset.built === '1') return;
+      try {
+        var holder = document.getElementById('poster-data');
+        if (holder && holder.textContent) {
+          var inlineData = holder.textContent.trim();
+          if (inlineData.startsWith('data:image')) {
+            try { localStorage.setItem('posterDataUrl', inlineData); } catch(e) {}
+            document.body.setAttribute('data-poster', inlineData);
+            poster.classList.add('img-mode');
+            poster.style.backgroundImage = 'url("' + inlineData + '")';
+            poster.dataset.built = '1';
+            poster.innerHTML = '';
+            return;
+          }
+        }
+      } catch(e) {}
+
+      try {
+        var stored = localStorage.getItem('posterDataUrl');
+        var storedSrc = localStorage.getItem('posterSource') || '';
+        var currentPath = document.body.getAttribute('data-poster-path') || '';
+        if (stored && stored.startsWith('data:image') && storedSrc === currentPath) {
+          poster.classList.add('img-mode');
+          poster.style.backgroundImage = 'url("' + stored + '")';
+          poster.dataset.built = '1';
+          poster.innerHTML = '';
+          return;
+        }
+      } catch (e) {}
+
+      var imgUrl = document.body.getAttribute('data-poster');
+      if (imgUrl && imgUrl.startsWith('data:image')) {
+        poster.classList.add('img-mode');
+        poster.style.backgroundImage = 'url("' + imgUrl + '")';
+        poster.dataset.built = '1';
+        try { localStorage.setItem('posterDataUrl', imgUrl); localStorage.setItem('posterSource', 'inline'); } catch (e) {}
+        return;
+      }
+
+      var path = document.body.getAttribute('data-poster-path');
+      if (path) {
+        try {
+          fetch(path).then(function(res){ return res.blob(); }).then(function(blob){
+            var fr = new FileReader();
+            fr.onload = function(){
+              var dataUrl = fr.result;
+              if (typeof dataUrl === 'string' && dataUrl.startsWith('data:image')) {
+                try { localStorage.setItem('posterDataUrl', dataUrl); localStorage.setItem('posterSource', path); } catch (e) {}
+                poster.classList.add('img-mode');
+                poster.style.backgroundImage = 'url("' + dataUrl + '")';
+                poster.dataset.built = '1';
+                poster.innerHTML = '';
+              }
+            };
+            fr.readAsDataURL(blob);
+          }).catch(function(){});
+        } catch (e) {}
+      }
+      poster.innerHTML = ''+
+        '<svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Poster vintage mare e bus">\n'
+      + '  <defs>\n'
+      + '    <linearGradient id="sunset" x1="0" y1="0" x2="0" y2="1">\n'
+      + '      <stop offset="0%" stop-color="#fde68a"/>\n'
+      + '      <stop offset="55%" stop-color="#60a5fa"/>\n'
+      + '      <stop offset="100%" stop-color="#1e3a8a"/>\n'
+      + '    </linearGradient>\n'
+      + '    <linearGradient id="sea" x1="0" y1="0" x2="1" y2="0">\n'
+      + '      <stop offset="0%" stop-color="rgba(6,182,212,0.75)"/>\n'
+      + '      <stop offset="100%" stop-color="rgba(29,78,216,0.8)"/>\n'
+      + '    </linearGradient>\n'
+      + '    <filter id="paper">\n'
+      + '      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" result="n"/>\n'
+      + '      <feColorMatrix in="n" type="saturate" values="0" result="noise"/>\n'
+      + '      <feBlend in="SourceGraphic" in2="noise" mode="soft-light"/>\n'
+      + '    </filter>\n'
+      + '  </defs>\n'
+      + '  <rect x="0" y="0" width="300" height="400" rx="10" fill="#f8fafc"/>\n'
+      + '  <rect x="8" y="8" width="284" height="384" rx="8" fill="url(#sunset)" stroke="rgba(59,130,246,0.55)" filter="url(#paper)"/>\n'
+      + '  <g opacity="0.9">\n'
+      + '    <rect x="8" y="210" width="284" height="182" fill="url(#sea)"/>\n'
+      + '    <path d="M8 230 C 58 220, 108 238, 158 228 S 258 236, 292 226" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="2"/>\n'
+      + '    <path d="M8 255 C 58 245, 108 263, 158 253 S 258 261, 292 251" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>\n'
+      + '    <path d="M8 280 C 58 270, 108 288, 158 278 S 258 286, 292 276" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>\n'
+      + '  </g>\n'
+      + '  <g>\n'
+      + '    <rect x="40" y="260" width="200" height="70" rx="12" fill="rgba(15,23,42,0.95)" stroke="rgba(59,130,246,0.75)" stroke-width="3"/>\n'
+      + '    <rect x="56" y="274" width="70" height="26" fill="rgba(14,165,233,0.75)" stroke="rgba(59,130,246,0.65)" stroke-width="2"/>\n'
+      + '    <rect x="132" y="272" width="54" height="28" fill="rgba(14,165,233,0.75)" stroke="rgba(59,130,246,0.65)" stroke-width="2"/>\n'
+      + '    <rect x="190" y="272" width="34" height="28" fill="rgba(14,165,233,0.75)" stroke="rgba(59,130,246,0.65)" stroke-width="2"/>\n'
+      + '    <circle cx="92" cy="332" r="12" fill="rgba(15,23,42,0.85)" stroke="rgba(148,163,184,0.55)" stroke-width="3"/>\n'
+      + '    <circle cx="204" cy="332" r="14" fill="rgba(15,23,42,0.85)" stroke="rgba(148,163,184,0.55)" stroke-width="3"/>\n'
+      + '    <path d="M232 260 q 18 4 24 16 q -6 9 -18 9 q -8 -8 -6 -25 z" fill="rgba(0,0,0,0.45)" stroke="rgba(59,130,246,0.5)" stroke-width="2"/>\n'
+      + '  </g>\n'
+      + '  <g opacity="0.75">\n'
+      + '    <rect x="22" y="24" width="256" height="30" rx="4" fill="rgba(15,23,42,0.9)"/>\n'
+      + '    <text x="150" y="45" text-anchor="middle" fill="#e5e7eb" font-family="Orbitron, Arial, sans-serif" font-weight="700" font-size="14">MOVE & REST</text>\n'
+      + '  </g>\n'
+      + '  <g opacity="0.9">\n'
+      + '    <rect x="22" y="356" width="256" height="24" rx="4" fill="#0ea5e9"/>\n'
+      + '    <text x="150" y="373" text-anchor="middle" fill="#0b1020" font-family="Orbitron, Arial, sans-serif" font-weight="700" font-size="13">KEEP ROLLING TO VICTORY</text>\n' 
+      + '  </g>\n'
+      + '</svg>';
+      poster.dataset.built = '1';
+    }
+
+    function placePoster() {
+      var poster = document.querySelector('.bg-poster');
+      var container = document.querySelector('.value-chain-container');
+      if (!poster || !container) return;
+      if (poster.dataset.built !== '1') buildPoster();
+      var vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+      var vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+      poster.style.left = 'auto';
+      poster.style.right = 'auto';
+      var rect = container.getBoundingClientRect();
+      var w = poster.offsetWidth || 300;
+      var h = poster.offsetHeight || (w * 4/3);
+      var left = Math.min(vw - w - 12, Math.max(rect.right + 16, 12));
+      var topMin = Math.round(vh * 0.1);
+      var topMax = Math.max(12, vh - h - 12);
+      var top = Math.min(topMax, topMin + Math.random() * (topMax - topMin));
+      poster.style.position = 'fixed';
+      poster.style.left = Math.round(left) + 'px';
+      poster.style.top = Math.round(top) + 'px';
+    }
+
+    function onReady() {
+      adjustTriangleLabel();
+      fitToViewport();
+      buildPoster();
+      placePoster();
+      var embedBtn = document.querySelector('.poster-embed-btn');
+      if (embedBtn) {
+        embedBtn.addEventListener('click', function(){
+          try {
+            var posterUrl = localStorage.getItem('posterDataUrl');
+            if (!posterUrl || !posterUrl.startsWith('data:image')) {
+              var path = document.body.getAttribute('data-poster-path');
+              if (path) {
+                fetch(path).then(function(res){ return res.blob(); }).then(function(blob){
+                  var fr = new FileReader();
+                  fr.onload = function(){
+                    var dataUrl = fr.result;
+                    if (typeof dataUrl === 'string' && dataUrl.startsWith('data:image')) {
+                      localStorage.setItem('posterDataUrl', dataUrl);
+                      localStorage.setItem('posterSource', 'embedded');
+                      var holder = document.getElementById('poster-data');
+                      if (holder) holder.textContent = JSON.stringify(dataUrl);
+                      document.body.removeAttribute('data-poster-path');
+                      document.body.setAttribute('data-poster', dataUrl);
+                      buildPoster();
+                      placePoster();
+                      alert('Poster incorporato nel file. Ora funziona offline.');
+                    }
+                  };
+                  fr.readAsDataURL(blob);
+                });
+                return;
+              }
+              alert('Poster non disponibile da incorporare. Assicurati che sia già visibile.');
+              return;
+            }
+            var holderOk = document.getElementById('poster-data');
+            if (holderOk) holderOk.textContent = JSON.stringify(posterUrl);
+            document.body.removeAttribute('data-poster-path');
+            document.body.setAttribute('data-poster', posterUrl);
+            buildPoster();
+            placePoster();
+            alert('Poster incorporato nel file. Ora funziona offline.');
+          } catch (e) {}
+        });
+      }
+      var pole = document.getElementById('stop-pole');
+      var bus = document.querySelector('.bg-bus .bus-anim');
+      var busSvg = document.querySelector('.bg-bus svg');
+      var waiting = document.querySelector('.bg-stop .waiting');
+      if (pole && bus && waiting && busSvg) {
+        pole.addEventListener('click', function() {
+          document.querySelectorAll('.bg-bus .bus-anim, .bg-bus svg').forEach(function(el){ el.classList.add('paused'); });
+          busSvg.classList.add('bus-centered');
+          waiting.classList.add('boarding-now');
+          setTimeout(function(){
+            document.querySelectorAll('.bg-bus .bus-anim, .bg-bus svg').forEach(function(el){ el.classList.remove('paused'); });
+            busSvg.classList.remove('bus-centered');
+            waiting.classList.remove('boarding-now');
+          }, 2500);
+        });
+      }
+      try {
+        var mode = document.body.getAttribute('data-bg') || 'gradient';
+        document.body.setAttribute('data-bg', mode);
+        var sw = document.querySelector('.bg-switcher');
+        if (sw) {
+          sw.addEventListener('click', function(e) {
+            var btn = e.target.closest('button[data-setbg]');
+            if (!btn) return;
+            var m = btn.getAttribute('data-setbg');
+            if (!m) return;
+            document.body.setAttribute('data-bg', m);
+            sw.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-pressed', String(b===btn)); });
+          });
+        }
+      } catch (err) {}
+
+      // Initialize wind-driven petals and ground gusts
+      setupWind();
+    }
+
+    window.addEventListener('DOMContentLoaded', onReady);
+    window.addEventListener('load', onReady);
+    window.addEventListener('resize', fitToViewport);
+    window.addEventListener('resize', placePoster);
+
+    // --- Wind and gust logic for Sakura petals ---
+    function setupWind() {
+      var wind = { angle: -12, speed: 1.0 }; // degrees, rightward slight downward
+      function applyWindVectors() {
+        var rad = wind.angle * Math.PI / 180;
+        var baseX = 220 * wind.speed; // px drift for airborne loop
+        var baseY = 60 * wind.speed;  // px vertical component
+        var ux = Math.cos(rad), uy = Math.sin(rad);
+        var dx = baseX * ux;
+        var dy = baseY + (baseX * 0.12 * uy);
+
+        // Assign vectors to wind-petals with slight randomness
+        document.querySelectorAll('.wind-petal').forEach(function(p){
+          var r = 0.8 + Math.random() * 0.6; // 0.8x..1.4x
+          p.style.setProperty('--dx', (dx * r).toFixed(1) + 'px');
+          p.style.setProperty('--dy', (dy * r).toFixed(1) + 'px');
+          // randomize duration a bit
+          var dur = 9 + Math.random() * 6; // 9-15s
+          p.style.setProperty('--dur', dur.toFixed(2) + 's');
+        });
+
+        // Store current vectors for gusts
+        setupWind._dx = dx; setupWind._dy = dy;
+      }
+
+      function gustOnce() {
+        var grounds = Array.prototype.slice.call(document.querySelectorAll('#ground-blossoms .ground-petal'));
+        if (!grounds.length) return scheduleNextGust();
+        var howMany = Math.max(2, Math.min(4, Math.round(Math.random()*4)));
+        for (var i=0; i<howMany; i++) {
+          var el = grounds[Math.floor(Math.random()*grounds.length)];
+          if (!el) continue;
+          var r = 0.6 + Math.random()*1.0; // 0.6..1.6
+          var jitterY = (Math.random()*20 - 10); // small up/down
+          var dx = (setupWind._dx || 160) * r;
+          var dy = (setupWind._dy || 50) * r + jitterY;
+          el.style.setProperty('--dx', dx.toFixed(1) + 'px');
+          el.style.setProperty('--dy', dy.toFixed(1) + 'px');
+          var dur = 4.5 + Math.random()*2.5; // 4.5-7s
+          el.style.setProperty('--dur', dur.toFixed(2) + 's');
+          // retrigger animation
+          el.classList.remove('lift');
+          // force reflow
+          void el.offsetWidth;
+          el.classList.add('lift');
+          el.addEventListener('animationend', function evEnd(){
+            this.classList.remove('lift');
+            this.removeEventListener('animationend', evEnd);
+          });
+        }
+        scheduleNextGust();
+      }
+
+      function scheduleNextGust() {
+        var t = 4500 + Math.random() * 4500; // 4.5s - 9s
+        setTimeout(gustOnce, t);
+      }
+
+      // API to change wind dynamically if needed later
+      setupWind.set = function(angleDeg, speed){
+        wind.angle = angleDeg; wind.speed = Math.max(0.4, speed || 1);
+        applyWindVectors();
+      };
+
+      applyWindVectors();
+      scheduleNextGust();
+    }
+  })();
+  </script>
+</body>
+</html>
