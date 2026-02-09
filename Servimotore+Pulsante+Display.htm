@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datasheet_Porte_Logiche_AND/OR/NOT</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            background-color: #f0f0f0; 
+            background-image: url('https://img.freepik.com/foto-premium/sfondo-dell-aurora-boreale-celeste-che-danza-attraverso-il-cielo-notturno-per-il-telefono_964851-68479.jpg?w=360');
+            background-size: cover; 
+            background-position: center; 
+        }
+        h1 {
+            color: white; 
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+        .button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #8B8C7A; 
+            color: white;
+            transition: background-color 0.3s; 
+        }
+        .button:hover {
+            background-color: #6B6C5E; 
+        }
+        pre {
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-width: 80%;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Codice :</h1> 
+
+    <pre>// Lezione 15
+// 5_ATele - Maxwell di Nichelino
+// Dong Francesco
+// Data:29/01/2026
+// Progetto: Pull_Down con Servo_Motore e Display_LCD
+
+#include <Servo.h>        // Libreria Servo
+
+#define PULS1     2
+#define PULS2     9
+
+
+Servo SERVOMOTORE_1 ;
+Servo SERVOMOTORE_2 ;
+
+
+// === VARIE DICHIARAZIONI ===
+int pinControllo_1 = 7  ;		
+int pinControllo_2 = 13 ;
+
+
+// === LIBRERIE  LCD ===
+
+// _Per TINKERCAD, usa questa:_
+
+//#include <Adafruit_LiquidCrystal.h>
+//Adafruit_LiquidCrystal lcd_1(32);
+
+
+// _Per ARDUINO IDE, usa questa:_
+//#include <LiquidCrystal_I2C.h>
+//LiquidCrystal_I2C lcd_1(0x27, 16, 2);
+
+
+void setup()
+{
+  
+  SERVOMOTORE_1.attach(pinControllo_1);		//Servo motore1 al commando di Arduino
+  SERVOMOTORE_2.attach(pinControllo_2);		//Servo motore2 al commando di Arduino
+
+  pinMode(PULS1, INPUT);
+  pinMode(PULS2, INPUT);
+  
+  SERVOMOTORE_1.write(90);           		// Arduino legge lo stato del Pulsante 1
+ 											// posizione 90 gradi a Destra
+  SERVOMOTORE_2.write(90);					// Arduino legge lo stato del Pulsante 2
+  											// posizione 90 gradi a Destra
+  
+   // INIZIALIZZAZIONE DEL DISPLAY
+   //lcd_1.init();             // DA USARE SU ARDUINO IDE
+   lcd_1.begin(16,2);
+   lcd_1.setBacklight(1);
+   lcd_1.setCursor (5,0);
+   lcd_1.print("LEGGO");
+   lcd_1.setCursor (0,1);
+   lcd_1.print("I TUOI COMMANDI");
+   delay(1000);
+   
+}
+
+void loop()
+{
+  
+  
+int ValPULS1 = digitalRead(PULS1);     // Dichiariamo una Variabile di tipo INTERO 
+                                       // Arduino legge lo stato del Pulsante 1
+int ValPULS2 = digitalRead(PULS2);     // Dichiariamo una Variabile di tipo INTERO 
+ 
+    
+
+  
+   if (ValPULS1 == HIGH)  // se il valore del Pulsante 1
+    {                     // è Alto, Arduino esegue
+                          // L’istruzione di seguito
+     
+   lcd_1.clear();           		// Clear LCD 
+   SERVOMOTORE_1.write(0);     		//Dice al servomotore di andare 
+                        			//alla posizione 0 gradi
+                       				//tutto a Destra, di solito
+   lcd_1.setCursor (0,0);
+   lcd_1.print("COMMANDI:");
+   lcd_1.setCursor (5,1);
+   lcd_1.print("DESTRA");
+   delay(1000);
+   
+   }
+     else{
+SERVOMOTORE_1.write(90);			//Dice al servomotore di andare 
+                       				//alla posizione 90 gradi
+                        			//tutto a Sinistra, per tornare
+   									//alla posizione iniziale 
+  }
+  
+  
+
+   if (ValPULS2 == HIGH) 				// se il valore del Pulsante 2
+    {                     				// è Alto, Arduino esegue
+                          				// L’istruzione di seguito
+     
+   lcd_1.clear();            			// Clear LCD 
+   SERVOMOTORE_2.write(180);        	//Dice al servomotore di andare 
+                       					//alla posizione 180 gradi
+                        				//tutto a Sinistra, di solito
+   lcd_1.setCursor (0,0);
+   lcd_1.print("COMMANDI:");
+   lcd_1.setCursor (5,1);
+   lcd_1.print("SINISTRA");
+   delay(1000);
+   }
+  else{
+SERVOMOTORE_2.write(90);				//Dice al servomotore di andare 
+                       					//alla posizione 90 gradi
+                        				//tutto a Sinistra, per tornare
+   										//alla posizione iniziale 
+  }
+    
+   
+}
+</pre>
+
+
+</body>
+</html>
+```
